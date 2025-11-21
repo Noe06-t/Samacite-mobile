@@ -1,0 +1,23 @@
+# Configuration build_runner
+
+# Dossiers à surveiller
+targets:
+  $default:
+    builders:
+      # Freezed
+      freezed:
+        enabled: true
+        generate_for:
+          - lib/**/*.dart
+          
+      # JSON Serializable
+      json_serializable:
+        enabled: true
+        generate_for:
+          - lib/**/*.dart
+          
+      # Riverpod
+      riverpod_generator:
+        enabled: true
+        generate_for:
+          - lib/**/*.dart
