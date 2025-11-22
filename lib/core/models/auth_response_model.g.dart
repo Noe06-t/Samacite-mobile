@@ -11,7 +11,7 @@ _$AuthResponseModelImpl _$$AuthResponseModelImplFromJson(
 ) => _$AuthResponseModelImpl(
   user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
   token: json['token'] as String,
-  tokenType: json['token_type'] as String?,
+  tokenType: json['token_type'] as String? ?? null,
 );
 
 Map<String, dynamic> _$$AuthResponseModelImplToJson(

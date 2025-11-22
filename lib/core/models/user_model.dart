@@ -7,11 +7,12 @@ part 'user_model.g.dart';
 class UserModel with _$UserModel {
   const factory UserModel({
     required int id,
-    required String name,
-    required String email,
-    String? phone,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
+    required String nom,
+    required String prenom,
+    String? email, // Email optionnel
+    required String telephone, // Téléphone obligatoire
+    @JsonKey(name: 'created_at') @Default(null) String? createdAt,
+    @JsonKey(name: 'updated_at') @Default(null) String? updatedAt,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

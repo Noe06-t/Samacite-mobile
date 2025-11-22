@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_samacite/core/constants/app_colors.dart';
 import 'package:mobile_samacite/features/auth/providers/auth_notifier.dart';
 import 'package:mobile_samacite/features/auth/providers/auth_state.dart';
-import 'package:mobile_samacite/features/home/pages/home_page.dart';
+import 'package:mobile_samacite/features/home/pages/main_navigation_page.dart';
 import 'package:mobile_samacite/features/auth/pages/login_page.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -15,7 +15,8 @@ class RegisterPage extends ConsumerStatefulWidget {
 
 class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final _prenomController = TextEditingController();
+  final _nomController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -26,7 +27,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _prenomController.dispose();
+    _nomController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
@@ -49,14 +51,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       return;
     }
 
+    // Ajout automatique du préfixe +221
+    final telephone = '+221${_phoneController.text.trim()}';
+    
     ref.read(authNotifierProvider.notifier).register(
-          name: _nameController.text.trim(),
-          email: _emailController.text.trim(),
+          nom: _nomController.text.trim(),
+          prenom: _prenomController.text.trim(),
+          email: _emailController.text.trim(), // Email optionnel
+          telephone: telephone, // Format: +221771234567
           password: _passwordController.text,
           passwordConfirmation: _confirmPasswordController.text,
-          phone: _phoneController.text.trim().isEmpty
-              ? null
-              : _phoneController.text.trim(),
         );
   }
 
@@ -69,14 +73,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         authenticated: (user, token) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Bienvenue ${user.name} !'),
+              content: Text('Bienvenue ${user.prenom} ${user.nom} !'),
               backgroundColor: Colors.green,
             ),
           );
-          // Navigation vers HomePage
+          // Navigation vers MainNavigationPage
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => const HomePage(),
+              builder: (context) => const MainNavigationPage(),
             ),
           );
         },
@@ -148,11 +152,31 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 
                 const SizedBox(height: 20),
                 
-                // Nom complet
+                // Prénom
                 TextFormField(
-                  controller: _nameController,
+                  controller: _prenomController,
                   decoration: InputDecoration(
-                    labelText: 'Nom complet',
+                    labelText: 'Prénom',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    prefixIcon: const Icon(Icons.person_outline),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Le prénom est requis';
+                    }
+                    return null;
+                  },
+                ),
+                
+                const SizedBox(height: 12),
+                
+                // Nom
+                TextFormField(
+                  controller: _nomController,
+                  decoration: InputDecoration(
+                    labelText: 'Nom',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -168,24 +192,27 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 
                 const SizedBox(height: 12),
                 
-                // Email
+                // Téléphone (obligatoire)
                 TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: 'Adresse e-mail',
+                    labelText: 'Téléphone',
+                    hintText: '77 123 45 67',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    prefixIcon: const Icon(Icons.email),
+                    prefixIcon: const Icon(Icons.phone),
+                    prefixText: '+221 ',
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'L\'email est requis';
+                      return 'Le téléphone est requis';
                     }
-                    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                    if (!emailRegex.hasMatch(value.trim())) {
-                      return 'Email invalide';
+                    // Validation: doit commencer par 7 et avoir 9 chiffres
+                    final phoneRegex = RegExp(r'^7[0-9]{8}$');
+                    if (!phoneRegex.hasMatch(value.trim())) {
+                      return 'Format invalide (ex: 771234567)';
                     }
                     return null;
                   },
@@ -193,17 +220,27 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 
                 const SizedBox(height: 12),
                 
-                // Téléphone (optionnel)
+                // Email (optionnel)
                 TextFormField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: 'Téléphone (optionnel)',
+                    labelText: 'Adresse e-mail (optionnel)',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    prefixIcon: const Icon(Icons.phone),
+                    prefixIcon: const Icon(Icons.email),
                   ),
+                  validator: (value) {
+                    // Email optionnel, mais s'il est fourni, il doit être valide
+                    if (value != null && value.trim().isNotEmpty) {
+                      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                      if (!emailRegex.hasMatch(value.trim())) {
+                        return 'Email invalide';
+                      }
+                    }
+                    return null;
+                  },
                 ),
                 
                 const SizedBox(height: 12),

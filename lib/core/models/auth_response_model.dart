@@ -9,7 +9,7 @@ class AuthResponseModel with _$AuthResponseModel {
   const factory AuthResponseModel({
     required UserModel user,
     required String token,
-    @JsonKey(name: 'token_type') String? tokenType,
+    @JsonKey(name: 'token_type') @Default(null) String? tokenType,
   }) = _AuthResponseModel;
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) =>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Image principale du signalement -->
+        <ImageView
+            android:id="@+id/ivSignalementImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:background="#CCCCCC" />
+
+        <!-- Titre -->
+        <TextView
+            android:id="@+id/tvTitreSignalement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Titre du signalement"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingTop="16dp"/>
+
+        <!-- Adresse -->
+        <TextView
+            android:id="@+id/tvAdresse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Adresse du signalement"
+            android:textSize="14sp"
+            android:paddingTop="4dp"
+            android:textColor="#555555"/>
+
+        <!-- Date et statut -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="6dp">
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12 Nov 2025"
+                android:textSize="12sp"
+                android:textColor="#777777"/>
+
+            <TextView
+                android:id="@+id/tvStatut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="En cours"
+                android:textSize="12sp"
+                android:paddingStart="16dp"
+                android:textColor="#1A73E8"/>
+        </LinearLayout>
+
+        <!-- Section description -->
+        <TextView
+            android:id="@+id/tvSectionDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingTop="20dp"/>
+
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Description complète du problème signalé."
+            android:textSize="14sp"
+            android:paddingTop="4dp"/>
+
+        <!-- Carte miniature -->
+        <TextView
+            android:id="@+id/tvSectionMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Localisation sur la carte"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingTop="20dp"/>
+
+        <FrameLayout
+            android:id="@+id/mapPreview"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#E0E0E0"
+            android:layout_marginTop="6dp"/>
+
+        <!-- Bouton voir sur la carte -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOuvrirCarte"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Voir sur la carte"
+            android:layout_marginTop="12dp"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+
+</ScrollView>

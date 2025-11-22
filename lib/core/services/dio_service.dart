@@ -29,12 +29,27 @@ class DioService {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
+          print('\n[DioService] 📤 ========== NOUVELLE REQUÊTE ==========');
+          print('[DioService] 🔸 Méthode: ${options.method}');
+          print('[DioService] 🔸 URL complète: ${options.baseUrl}${options.path}');
+          print('[DioService] 🔸 Path: ${options.path}');
+          print('[DioService] 🔸 Headers: ${options.headers}');
+          print('[DioService] 🔸 Data: ${options.data}');
+          print('[DioService] 🔸 Query Parameters: ${options.queryParameters}');
+          
           _logger.d('REQUEST[${options.method}] => PATH: ${options.path}');
           _logger.d('Headers: ${options.headers}');
           _logger.d('Data: ${options.data}');
           return handler.next(options);
         },
         onResponse: (response, handler) {
+          print('\n[DioService] 📥 ========== RÉPONSE REÇUE ==========');
+          print('[DioService] ✅ Status Code: ${response.statusCode}');
+          print('[DioService] 🔸 Path: ${response.requestOptions.path}');
+          print('[DioService] 🔸 Headers: ${response.headers}');
+          print('[DioService] 🔸 Data: ${response.data}');
+          print('[DioService] 📥 ========================================\n');
+          
           _logger.i(
             'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
           );
@@ -42,6 +57,15 @@ class DioService {
           return handler.next(response);
         },
         onError: (error, handler) {
+          print('\n[DioService] ❌ ========== ERREUR HTTP ==========');
+          print('[DioService] ❌ Status Code: ${error.response?.statusCode}');
+          print('[DioService] 🔸 Type: ${error.type}');
+          print('[DioService] 🔸 Path: ${error.requestOptions.path}');
+          print('[DioService] 🔸 Message: ${error.message}');
+          print('[DioService] 🔸 Response Data: ${error.response?.data}');
+          print('[DioService] 🔸 Response Headers: ${error.response?.headers}');
+          print('[DioService] ❌ =====================================\n');
+          
           _logger.e(
             'ERROR[${error.response?.statusCode}] => PATH: ${error.requestOptions.path}',
           );

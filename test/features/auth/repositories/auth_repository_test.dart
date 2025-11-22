@@ -27,7 +27,9 @@ void main() {
       test('should return AuthResponseModel on successful registration', () async {
         // Arrange
         final registerData = {
-          'name': 'Test User',
+          'nom': 'User',
+          'prenom': 'Test',
+          'telephone': '221777777777',
           'email': 'test@example.com',
           'password': 'password123',
           'password_confirmation': 'password123',
@@ -36,8 +38,10 @@ void main() {
         final mockResponse = {
           'user': {
             'id': 1,
-            'name': 'Test User',
+            'nom': 'User',
+            'prenom': 'Test',
             'email': 'test@example.com',
+            'telephone': '221777777777',
           },
           'token': 'test-token-123',
           'token_type': 'Bearer',
@@ -57,15 +61,18 @@ void main() {
 
         // Assert
         expect(result, isA<AuthResponseModel>());
-        expect(result.user.name, 'Test User');
-        expect(result.user.email, 'test@example.com');
-        expect(result.token, 'test-token-123');
+        expect(result.user.nom, equals('User'));
+        expect(result.user.prenom, equals('Test'));
+        expect(result.user.email, equals('test@example.com'));
+        expect(result.token, equals('test-token-123'));
       });
 
       test('should throw ApiException on registration failure', () async {
         // Arrange
         final registerData = {
-          'name': 'Test User',
+          'nom': 'User',
+          'prenom': 'Test',
+          'telephone': '221777777777',
           'email': 'test@example.com',
           'password': 'password123',
           'password_confirmation': 'password123',
@@ -93,7 +100,9 @@ void main() {
       test('should validate required fields', () async {
         // Arrange
         final invalidData = {
-          'name': '',
+          'nom': '',
+          'prenom': '',
+          'telephone': '',
           'email': 'invalid-email',
           'password': '123',
         };
@@ -108,7 +117,9 @@ void main() {
       test('should validate password confirmation match', () async {
         // Arrange
         final invalidData = {
-          'name': 'Test User',
+          'nom': 'User',
+          'prenom': 'Test',
+          'telephone': '221777777777',
           'email': 'test@example.com',
           'password': 'password123',
           'password_confirmation': 'different-password',

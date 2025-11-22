@@ -6,13 +6,19 @@ part of 'auth_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dioServiceHash() => r'0020784c9cb7067453ec2b097d72d21253b7c4b4';
+String _$dioServiceHash() => r'889a9c3e81c87e81cf74a8045f600cdc31931ff2';
 
-/// Provider pour DioService
+/// Provider pour DioService (singleton avec keepAlive)
+///
+/// IMPORTANT: keepAlive est nécessaire pour garantir qu'une seule instance
+/// de DioService existe dans l'application. Cela permet de :
+/// - Partager le même token d'authentification entre tous les repositories
+/// - Éviter de créer plusieurs instances Dio
+/// - Maintenir la cohérence des intercepteurs
 ///
 /// Copied from [dioService].
 @ProviderFor(dioService)
-final dioServiceProvider = AutoDisposeProvider<DioService>.internal(
+final dioServiceProvider = Provider<DioService>.internal(
   dioService,
   name: r'dioServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -24,7 +30,7 @@ final dioServiceProvider = AutoDisposeProvider<DioService>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef DioServiceRef = AutoDisposeProviderRef<DioService>;
+typedef DioServiceRef = ProviderRef<DioService>;
 String _$secureStorageServiceHash() =>
     r'28ef5a96de61720fa06a7ba59ceb572a1791b078';
 

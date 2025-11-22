@@ -163,7 +163,7 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
   const _$AuthResponseModelImpl({
     required this.user,
     required this.token,
-    @JsonKey(name: 'token_type') this.tokenType,
+    @JsonKey(name: 'token_type') this.tokenType = null,
   });
 
   factory _$AuthResponseModelImpl.fromJson(Map<String, dynamic> json) =>

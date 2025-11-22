@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_samacite/core/constants/app_colors.dart';
 import 'package:mobile_samacite/features/auth/providers/auth_notifier.dart';
 import 'package:mobile_samacite/features/auth/pages/register_page.dart';
-import 'package:mobile_samacite/features/home/pages/home_page.dart';
+import 'package:mobile_samacite/features/home/pages/main_navigation_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -26,12 +26,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   void _handleLogin() {
+    print('[LoginPage] \ud83d\udd11 Bouton de connexion press\u00e9');
+    print('[LoginPage] \u2714\ufe0f Validation du formulaire...');
+    
     if (!_formKey.currentState!.validate()) {
+      print('[LoginPage] ❌ Validation du formulaire échouée');
       return;
     }
 
+    final identifier = _emailController.text.trim();
+    print('[LoginPage] ✅ Formulaire valide');
+    print('[LoginPage] 🆔 Identifiant (email ou téléphone): $identifier');
+    
+    // Si c'est un téléphone, ajouter le préfixe +221
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final isEmail = emailRegex.hasMatch(identifier);
+    final finalIdentifier = isEmail ? identifier : '+221$identifier';
+    
+    print('[LoginPage] 🔄 Identifiant final: $finalIdentifier');
+    print('[LoginPage] 🔐 Appel de authNotifier.login()...');
+    
     ref.read(authNotifierProvider.notifier).login(
-          email: _emailController.text.trim(),
+          email: finalIdentifier, // Email ou téléphone avec préfixe 221
           password: _passwordController.text,
         );
   }
@@ -41,22 +57,35 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final authState = ref.watch(authNotifierProvider);
 
     ref.listen(authNotifierProvider, (previous, next) {
+      print('[LoginPage] \ud83d\udd0a Changement d\'\u00e9tat d\u00e9tect\u00e9');
+      print('[LoginPage] \ud83d\udcca \u00c9tat pr\u00e9c\u00e9dent: $previous');
+      print('[LoginPage] \ud83d\udcca Nouvel \u00e9tat: $next');
+      
       next.maybeWhen(
         authenticated: (user, token) {
+          print('[LoginPage] \u2705 \u00c9tat: AUTHENTICATED');
+          print('[LoginPage] \ud83d\udc64 User: ${user.prenom} ${user.nom}');
+          print('[LoginPage] \ud83d\udd11 Token: ${token.substring(0, 20)}...');
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Bienvenue ${user.name} !'),
+              content: Text('Bienvenue ${user.prenom} ${user.nom} !'),
               backgroundColor: Colors.green,
             ),
           );
-          // Navigation vers HomePage
+          
+          print('[LoginPage] 🧐 Navigation vers MainNavigationPage...');
+          // Navigation vers MainNavigationPage
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => const HomePage(),
+              builder: (context) => const MainNavigationPage(),
             ),
           );
         },
         error: (message) {
+          print('[LoginPage] \u274c \u00c9tat: ERROR');
+          print('[LoginPage] \ud83d\udcc4 Message: $message');
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(message),
@@ -64,7 +93,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
           );
         },
-        orElse: () {},
+        loading: () {
+          print('[LoginPage] \u23f3 \u00c9tat: LOADING');
+        },
+        orElse: () {
+          print('[LoginPage] \ud83e\udd37 \u00c9tat: AUTRE');
+        },
       );
     });
 
@@ -117,21 +151,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.text,
                     decoration: InputDecoration(
-                      labelText: 'Adresse e-mail',
+                      labelText: 'Email ou Téléphone',
+                      hintText: 'exemple@email.com ou 771234567',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      prefixIcon: const Icon(Icons.email),
+                      prefixIcon: const Icon(Icons.person),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Email requis';
+                        return 'Email ou téléphone requis';
                       }
+                      // Si c'est un numéro, valider le format
                       final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
                       if (!emailRegex.hasMatch(value.trim())) {
-                        return 'Email invalide';
+                        // C'est un téléphone, doit commencer par 7
+                        final phoneRegex = RegExp(r'^7[0-9]{8}$');
+                        if (!phoneRegex.hasMatch(value.trim())) {
+                          return 'Format invalide (ex: 771234567)';
+                        }
                       }
                       return null;
                     },
