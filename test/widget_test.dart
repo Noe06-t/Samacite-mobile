@@ -14,10 +14,15 @@ void main() {
       ),
     );
 
+    // Attendre que le build soit terminé
+    await tester.pumpAndSettle();
+
     // Verify that the RegisterPage is displayed
     expect(find.text('Créer un compte'), findsOneWidget);
-    expect(find.text('Nom complet'), findsOneWidget);
-    expect(find.text('Adresse e-mail'), findsOneWidget);
+    expect(find.text('Prénom'), findsOneWidget);
+    expect(find.text('Nom'), findsOneWidget);
+    expect(find.text('Téléphone'), findsOneWidget);
+    expect(find.textContaining('Adresse e-mail'), findsOneWidget);
     expect(find.text('S\'inscrire'), findsOneWidget);
   });
 }

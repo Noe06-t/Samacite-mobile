@@ -12,8 +12,7 @@ part of 'location_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 LocationModel _$LocationModelFromJson(Map<String, dynamic> json) {
   return _LocationModel.fromJson(json);
@@ -25,12 +24,8 @@ mixin _$LocationModel {
   double get longitude => throw _privateConstructorUsedError;
   String? get address => throw _privateConstructorUsedError;
 
-  /// Serializes this LocationModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of LocationModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $LocationModelCopyWith<LocationModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -38,9 +33,8 @@ mixin _$LocationModel {
 /// @nodoc
 abstract class $LocationModelCopyWith<$Res> {
   factory $LocationModelCopyWith(
-    LocationModel value,
-    $Res Function(LocationModel) then,
-  ) = _$LocationModelCopyWithImpl<$Res, LocationModel>;
+          LocationModel value, $Res Function(LocationModel) then) =
+      _$LocationModelCopyWithImpl<$Res, LocationModel>;
   @useResult
   $Res call({double latitude, double longitude, String? address});
 }
@@ -55,8 +49,6 @@ class _$LocationModelCopyWithImpl<$Res, $Val extends LocationModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of LocationModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -64,23 +56,20 @@ class _$LocationModelCopyWithImpl<$Res, $Val extends LocationModel>
     Object? longitude = null,
     Object? address = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            latitude: null == latitude
-                ? _value.latitude
-                : latitude // ignore: cast_nullable_to_non_nullable
-                      as double,
-            longitude: null == longitude
-                ? _value.longitude
-                : longitude // ignore: cast_nullable_to_non_nullable
-                      as double,
-            address: freezed == address
-                ? _value.address
-                : address // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      latitude: null == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      longitude: null == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 }
 
@@ -88,9 +77,8 @@ class _$LocationModelCopyWithImpl<$Res, $Val extends LocationModel>
 abstract class _$$LocationModelImplCopyWith<$Res>
     implements $LocationModelCopyWith<$Res> {
   factory _$$LocationModelImplCopyWith(
-    _$LocationModelImpl value,
-    $Res Function(_$LocationModelImpl) then,
-  ) = __$$LocationModelImplCopyWithImpl<$Res>;
+          _$LocationModelImpl value, $Res Function(_$LocationModelImpl) then) =
+      __$$LocationModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({double latitude, double longitude, String? address});
@@ -101,12 +89,9 @@ class __$$LocationModelImplCopyWithImpl<$Res>
     extends _$LocationModelCopyWithImpl<$Res, _$LocationModelImpl>
     implements _$$LocationModelImplCopyWith<$Res> {
   __$$LocationModelImplCopyWithImpl(
-    _$LocationModelImpl _value,
-    $Res Function(_$LocationModelImpl) _then,
-  ) : super(_value, _then);
+      _$LocationModelImpl _value, $Res Function(_$LocationModelImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of LocationModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -114,33 +99,28 @@ class __$$LocationModelImplCopyWithImpl<$Res>
     Object? longitude = null,
     Object? address = freezed,
   }) {
-    return _then(
-      _$LocationModelImpl(
-        latitude: null == latitude
-            ? _value.latitude
-            : latitude // ignore: cast_nullable_to_non_nullable
-                  as double,
-        longitude: null == longitude
-            ? _value.longitude
-            : longitude // ignore: cast_nullable_to_non_nullable
-                  as double,
-        address: freezed == address
-            ? _value.address
-            : address // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
+    return _then(_$LocationModelImpl(
+      latitude: null == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      longitude: null == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$LocationModelImpl implements _LocationModel {
-  const _$LocationModelImpl({
-    required this.latitude,
-    required this.longitude,
-    this.address,
-  });
+  const _$LocationModelImpl(
+      {required this.latitude, required this.longitude, this.address});
 
   factory _$LocationModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$LocationModelImplFromJson(json);
@@ -169,13 +149,11 @@ class _$LocationModelImpl implements _LocationModel {
             (identical(other.address, address) || other.address == address));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, latitude, longitude, address);
 
-  /// Create a copy of LocationModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$LocationModelImplCopyWith<_$LocationModelImpl> get copyWith =>
@@ -183,16 +161,17 @@ class _$LocationModelImpl implements _LocationModel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$LocationModelImplToJson(this);
+    return _$$LocationModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _LocationModel implements LocationModel {
-  const factory _LocationModel({
-    required final double latitude,
-    required final double longitude,
-    final String? address,
-  }) = _$LocationModelImpl;
+  const factory _LocationModel(
+      {required final double latitude,
+      required final double longitude,
+      final String? address}) = _$LocationModelImpl;
 
   factory _LocationModel.fromJson(Map<String, dynamic> json) =
       _$LocationModelImpl.fromJson;
@@ -203,11 +182,8 @@ abstract class _LocationModel implements LocationModel {
   double get longitude;
   @override
   String? get address;
-
-  /// Create a copy of LocationModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$LocationModelImplCopyWith<_$LocationModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

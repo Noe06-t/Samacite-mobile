@@ -5,6 +5,7 @@ import 'package:mobile_samacite/features/reports/providers/report_state.dart';
 import 'package:mobile_samacite/features/reports/repositories/report_repository.dart';
 import 'package:mobile_samacite/core/services/image_service.dart';
 import 'package:mobile_samacite/core/services/location_service.dart';
+import 'package:mobile_samacite/core/services/ai_analysis_service.dart';
 import 'package:mobile_samacite/features/auth/providers/auth_providers.dart';
 
 /// Provider pour le ReportNotifier
@@ -14,14 +15,21 @@ final reportNotifierProvider =
   final reportRepository = ReportRepository(dioService);
   final imageService = ImageService();
   final locationService = LocationService();
+  final aiAnalysisService = ref.watch(aiAnalysisServiceProvider);
 
-  return ReportNotifier(reportRepository, imageService, locationService);
+  return ReportNotifier(
+    reportRepository,
+    imageService,
+    locationService,
+    aiAnalysisService,
+  );
 });
 
 /// Notifier pour gérer l'état de création de signalement
 /// 
 /// Responsabilités :
 /// - Orchestrer la sélection d'images
+/// - Analyser automatiquement avec IA après ajout photo
 /// - Gérer la capture de localisation GPS
 /// - Soumettre le signalement au backend
 /// - Gérer les états (loading, success, error)
@@ -29,16 +37,19 @@ class ReportNotifier extends StateNotifier<ReportState> {
   final ReportRepository _repository;
   final ImageService _imageService;
   final LocationService _locationService;
+  final AIAnalysisService _aiAnalysisService;
 
   ReportNotifier(
     this._repository,
     this._imageService,
     this._locationService,
+    this._aiAnalysisService,
   ) : super(ReportState.initial());
 
   /// Sélectionne des images depuis la galerie
   /// 
   /// Respecte la limite de 5 images (spec.md Phase 2)
+  /// Lance l'analyse IA automatiquement après ajout de la première photo
   Future<void> selectImages() async {
     try {
       final images = await _imageService.pickMultipleImages(
@@ -52,6 +63,11 @@ class ReportNotifier extends StateNotifier<ReportState> {
           selectedImages: allImages,
           errorMessage: null,
         );
+
+        // Auto-analyse avec IA si c'est la première photo et qu'on n'a pas déjà analysé
+        if (allImages.length == 1 && state.aiAnalysisResult == null) {
+          await analyzeImageWithAI();
+        }
       }
     } catch (e) {
       state = state.copyWith(
@@ -61,6 +77,7 @@ class ReportNotifier extends StateNotifier<ReportState> {
   }
 
   /// Prend une photo avec la caméra
+  /// Lance l'analyse IA automatiquement après capture de la première photo
   Future<void> takePicture() async {
     try {
       // Vérifier qu'on ne dépasse pas la limite
@@ -79,6 +96,11 @@ class ReportNotifier extends StateNotifier<ReportState> {
           selectedImages: allImages,
           errorMessage: null,
         );
+
+        // Auto-analyse avec IA si c'est la première photo et qu'on n'a pas déjà analysé
+        if (allImages.length == 1 && state.aiAnalysisResult == null) {
+          await analyzeImageWithAI();
+        }
       }
     } catch (e) {
       state = state.copyWith(
@@ -101,7 +123,46 @@ class ReportNotifier extends StateNotifier<ReportState> {
     state = state.copyWith(selectedImages: images);
   }
 
-  /// Capture la position GPS actuelle
+  /// Analyse la première image avec IA et stocke le résultat
+  /// 
+  /// Appelée automatiquement après ajout de la première photo
+  /// Le résultat peut être utilisé pour pré-remplir le formulaire
+  Future<void> analyzeImageWithAI() async {
+    if (state.selectedImages.isEmpty) {
+      return;
+    }
+
+    state = state.copyWith(
+      isAnalyzing: true,
+      aiAnalysisError: null,
+    );
+
+    try {
+      final firstImagePath = state.selectedImages.first.path;
+      final result = await _aiAnalysisService.analyzeImage(firstImagePath);
+      
+      state = state.copyWith(
+        isAnalyzing: false,
+        aiAnalysisResult: result,
+        aiAnalysisError: null,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isAnalyzing: false,
+        aiAnalysisError: 'Analyse IA échouée: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Réinitialise les résultats de l'analyse IA (pour réanalyser)
+  void clearAIAnalysis() {
+    state = state.copyWith(
+      aiAnalysisResult: null,
+      aiAnalysisError: null,
+    );
+  }
+
+  /// Capture la position GPS actuelle avec timeout et fallback
   Future<void> captureLocation() async {
     state = state.copyWith(
       isLoadingLocation: true,
@@ -109,7 +170,26 @@ class ReportNotifier extends StateNotifier<ReportState> {
     );
 
     try {
-      final position = await _locationService.getCurrentPosition();
+      // Tentative avec haute précision (timeout 10s)
+      final position = await _locationService.getCurrentPosition()
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () async {
+              // Fallback: utiliser précision moyenne plus rapide
+              try {
+                return await Geolocator.getCurrentPosition(
+                  desiredAccuracy: LocationAccuracy.medium,
+                  timeLimit: const Duration(seconds: 5),
+                );
+              } catch (e) {
+                // Dernier recours: précision basse
+                return await Geolocator.getCurrentPosition(
+                  desiredAccuracy: LocationAccuracy.low,
+                  timeLimit: const Duration(seconds: 3),
+                );
+              }
+            },
+          );
 
       state = state.copyWith(
         position: position,
@@ -117,9 +197,19 @@ class ReportNotifier extends StateNotifier<ReportState> {
         locationError: null,
       );
     } catch (e) {
+      String errorMessage = 'Impossible de capturer votre position';
+      
+      if (e.toString().contains('permission')) {
+        errorMessage = 'Permission de localisation refusée. Activez-la dans les paramètres.';
+      } else if (e.toString().contains('service')) {
+        errorMessage = 'GPS désactivé. Activez la localisation sur votre appareil.';
+      } else if (e.toString().contains('timeout')) {
+        errorMessage = 'La capture prend trop de temps. Vérifiez votre connexion GPS.';
+      }
+      
       state = state.copyWith(
         isLoadingLocation: false,
-        locationError: e.toString(),
+        locationError: errorMessage,
       );
     }
   }
@@ -219,6 +309,10 @@ class ReportNotifier extends StateNotifier<ReportState> {
         createdReport: createdReport,
         errorMessage: null,
       );
+      
+      // CORRECTION 3 : Invalider le cache de la liste pour forcer le refresh
+      // Note : Cette fonctionnalité sera complétée en Phase 6 avec cache Redis
+      // Pour l'instant, ReportListPage rechargera automatiquement à l'ouverture
     } catch (e) {
       state = state.copyWith(
         status: ReportStatus.error,

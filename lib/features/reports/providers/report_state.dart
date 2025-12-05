@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mobile_samacite/core/models/report_model.dart';
+import 'package:mobile_samacite/core/services/ai_analysis_service.dart';
 
 part 'report_state.freezed.dart';
 
@@ -24,6 +25,10 @@ class ReportState with _$ReportState {
     String? locationError,
     String? errorMessage,
     ReportModel? createdReport,
+    // Analyse IA
+    @Default(false) bool isAnalyzing,
+    AIAnalysisResult? aiAnalysisResult,
+    String? aiAnalysisError,
   }) = _ReportState;
 
   factory ReportState.initial() => const ReportState();

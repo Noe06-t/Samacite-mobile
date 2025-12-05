@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_samacite/features/reports/providers/report_notifier.dart';
 import 'package:mobile_samacite/features/reports/providers/category_notifier.dart';
 import 'package:mobile_samacite/features/reports/providers/report_state.dart';
+import 'package:mobile_samacite/core/widgets/modern_button.dart';
+import 'package:mobile_samacite/core/widgets/modern_text_field.dart';
 
 class CreateReportPage extends ConsumerStatefulWidget {
   const CreateReportPage({super.key});
@@ -17,6 +19,24 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   int? _selectedCategoryId;
+
+  @override
+  void initState() {
+    super.initState();
+    // Capturer la localisation automatiquement au chargement
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(reportNotifierProvider.notifier).captureLocation();
+      
+      // Pré-remplir le formulaire avec les résultats de l'IA
+      final reportState = ref.read(reportNotifierProvider);
+      if (reportState.aiAnalysisResult != null) {
+        final aiResult = reportState.aiAnalysisResult!;
+        _titleController.text = aiResult.title;
+        _descriptionController.text = aiResult.description;
+        _selectedCategoryId = aiResult.categoryId;
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -33,12 +53,22 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
           backgroundColor: Color(0xFF007A3F),
         ),
       );
+      
       // Réinitialiser le formulaire
       _formKey.currentState?.reset();
       _titleController.clear();
       _descriptionController.clear();
-      setState(() => _selectedCategoryId = null);
+      setState(() {
+        _selectedCategoryId = null;
+      });
       ref.read(reportNotifierProvider.notifier).reset();
+      
+      // CORRECTION 1 : Redirection vers HomePage après 1 seconde
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          Navigator.of(context).pop(); // Retour à l'accueil
+        }
+      });
     } else if (next.status == ReportStatus.error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -50,6 +80,19 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
   }
 
   void _submitForm() {
+    final reportState = ref.read(reportNotifierProvider);
+    
+    // Validation : au moins 1 photo obligatoire
+    if (reportState.selectedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('📸 Veuillez ajouter au moins une photo'),
+          backgroundColor: Color(0xFFEA0707),
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedCategoryId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -79,30 +122,54 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nouveau Signalement'),
-        backgroundColor: const Color(0xFF007A3F),
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Nouveau Signalement',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF007A3F), Color(0xFF00A854)],
+            ),
+          ),
+        ),
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.arrow_back_rounded, size: 20),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Section Photos
-              _buildPhotoSection(reportState),
+              // Aperçu de la photo
+              _buildPhotoPreview(reportState),
               const SizedBox(height: 24),
 
               // Champ Titre
-              TextFormField(
+              ModernTextField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Titre',
-                  hintText: 'Ex: Nid de poule sur la route',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.title),
-                ),
+                label: 'Titre',
+                hint: 'Ex: Nid de poule sur la route',
+                prefixIcon: Icons.title,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Le titre est requis';
@@ -115,13 +182,10 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
 
               // Dropdown Catégorie
               categoriesAsync.when(
-                data: (categories) => DropdownButtonFormField<int>(
+                data: (categories) => ModernDropdownField<int>(
                   value: _selectedCategoryId,
-                  decoration: const InputDecoration(
-                    labelText: 'Catégorie',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.category),
-                  ),
+                  label: 'Catégorie',
+                  prefixIcon: Icons.category,
                   items: categories.map((category) {
                     return DropdownMenuItem<int>(
                       value: category.id,
@@ -141,6 +205,7 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
                     }
                     return null;
                   },
+                  enabled: reportState.status != ReportStatus.submitting,
                 ),
                 loading: () => const LinearProgressIndicator(),
                 error: (error, _) => Text(
@@ -151,22 +216,13 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
               const SizedBox(height: 16),
 
               // Champ Description
-              TextFormField(
+              ModernTextField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  hintText: 'Décrivez le problème en détail',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.description),
-                  alignLabelWithHint: true,
-                ),
+                label: 'Description',
+                hint: 'Pré-remplie par l\'IA - vous pouvez la modifier',
+                prefixIcon: Icons.description,
                 maxLines: 5,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'La description est requise';
-                  }
-                  return null;
-                },
+                validator: null,
                 enabled: reportState.status != ReportStatus.submitting,
               ),
               const SizedBox(height: 24),
@@ -176,42 +232,14 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
               const SizedBox(height: 32),
 
               // Bouton Soumettre
-              SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: reportState.status == ReportStatus.submitting
-                      ? null
-                      : _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFA000),
-                    foregroundColor: Colors.black,
-                    disabledBackgroundColor: Colors.grey[300],
-                  ),
-                  child: reportState.status == ReportStatus.submitting
-                      ? const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.black),
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Text('En cours...'),
-                          ],
-                        )
-                      : const Text(
-                          'Créer le signalement',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
+              ModernButton(
+                text: 'Créer le signalement',
+                icon: Icons.check_circle,
+                onPressed: reportState.status == ReportStatus.submitting
+                    ? null
+                    : _submitForm,
+                isLoading: reportState.status == ReportStatus.submitting,
+                height: 56,
               ),
             ],
           ),
@@ -220,9 +248,10 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
     );
   }
 
-  Widget _buildPhotoSection(ReportState state) {
-    final imageCount = state.selectedImages.length;
-    final canAddMore = imageCount < 5;
+  Widget _buildPhotoPreview(ReportState state) {
+    if (state.selectedImages.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Card(
       elevation: 2,
@@ -231,119 +260,32 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            const Row(
               children: [
-                const Text(
-                  'Photos',
+                Icon(Icons.check_circle, color: Color(0xFF007A3F), size: 20),
+                SizedBox(width: 8),
+                Text(
+                  'Photo analysée par l\'IA',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$imageCount/5 photos',
-                  style: TextStyle(
-                    color: imageCount >= 5 ? const Color(0xFFEA0707) : Colors.grey[600],
-                    fontWeight: imageCount >= 5 ? FontWeight.bold : FontWeight.normal,
+                    color: Color(0xFF007A3F),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-
-            // Grille de photos sélectionnées
-            if (imageCount > 0)
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                ),
-                itemCount: imageCount,
-                itemBuilder: (context, index) {
-                  final image = state.selectedImages[index];
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          File(image.path),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () {
-                            ref
-                                .read(reportNotifierProvider.notifier)
-                                .removeImage(index);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFEA0707),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
+            
+            // Aperçu de la photo
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                File(state.selectedImages.first.path),
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
               ),
-
-            if (imageCount > 0) const SizedBox(height: 12),
-
-            // Boutons Ajouter photos
-            if (canAddMore)
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: state.status != ReportStatus.submitting
-                          ? () {
-                              ref
-                                  .read(reportNotifierProvider.notifier)
-                                  .selectImages();
-                            }
-                          : null,
-                      icon: const Icon(Icons.photo_library),
-                      label: const Text('Ajouter des photos'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF007A3F),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: state.status != ReportStatus.submitting
-                          ? () {
-                              ref
-                                  .read(reportNotifierProvider.notifier)
-                                  .takePicture();
-                            }
-                          : null,
-                      icon: const Icon(Icons.camera_alt),
-                      label: const Text('Prendre une photo'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF007A3F),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            ),
           ],
         ),
       ),
@@ -358,14 +300,55 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Localisation',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              children: [
+                const Text(
+                  'Localisation',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                if (state.isLoadingLocation)
+                  const SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF007A3F)),
+                    ),
+                  ),
+                if (state.position != null)
+                  const Icon(
+                    Icons.check_circle,
+                    color: Color(0xFF007A3F),
+                    size: 20,
+                  ),
+              ],
             ),
             const SizedBox(height: 12),
+
+            if (state.isLoadingLocation)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFA000).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.gps_fixed, color: Color(0xFFFFA000)),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Capture automatique de votre position en cours...',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
             if (state.position != null)
               Container(
@@ -382,13 +365,21 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const Text(
+                            'Position capturée automatiquement',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
                           Text(
-                            'Latitude: ${state.position!.latitude.toStringAsFixed(4)}',
-                            style: const TextStyle(fontSize: 12),
+                            'Lat: ${state.position!.latitude.toStringAsFixed(6)}',
+                            style: const TextStyle(fontSize: 11),
                           ),
                           Text(
-                            'Longitude: ${state.position!.longitude.toStringAsFixed(4)}',
-                            style: const TextStyle(fontSize: 12),
+                            'Long: ${state.position!.longitude.toStringAsFixed(6)}',
+                            style: const TextStyle(fontSize: 11),
                           ),
                         ],
                       ),
@@ -418,51 +409,39 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
                 ),
               ),
 
-            if (state.position != null || state.locationError != null)
-              const SizedBox(height: 12),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: state.status != ReportStatus.submitting &&
-                        !state.isLoadingLocation
-                    ? () {
-                        ref
-                            .read(reportNotifierProvider.notifier)
-                            .captureLocation();
-                      }
-                    : null,
-                icon: state.isLoadingLocation
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Icon(Icons.my_location),
-                label: Text(
-                  state.isLoadingLocation
-                      ? 'Localisation en cours...'
-                      : 'Capturer ma position',
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF007A3F),
-                  foregroundColor: Colors.white,
+            if (state.locationError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: ModernOutlineButton(
+                  text: 'Réessayer',
+                  icon: Icons.refresh,
+                  onPressed: state.status != ReportStatus.submitting &&
+                          !state.isLoadingLocation
+                      ? () {
+                          ref
+                              .read(reportNotifierProvider.notifier)
+                              .captureLocation();
+                        }
+                      : null,
+                  color: const Color(0xFF007A3F),
+                  height: 48,
                 ),
               ),
-            ),
 
-            const SizedBox(height: 8),
-            Text(
-              'La localisation est optionnelle mais recommandée',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontStyle: FontStyle.italic,
+            if (state.position == null && 
+                state.locationError == null && 
+                !state.isLoadingLocation)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(
+                  'La localisation sera capturée automatiquement',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
               ),
-            ),
           ],
         ),
       ),

@@ -23,11 +23,12 @@ _$ReportModelImpl _$$ReportModelImplFromJson(Map<String, dynamic> json) =>
       location: json['location'] == null
           ? null
           : LocationModel.fromJson(json['location'] as Map<String, dynamic>),
-      images:
-          (json['images'] as List<dynamic>?)
+      images: (json['images'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      likesCount: (json['likes_count'] as num?)?.toInt() ?? 0,
+      isLiked: json['is_liked'] as bool? ?? false,
       createdAt: json['created_at'] as String? ?? null,
       updatedAt: json['updated_at'] as String? ?? null,
     );
@@ -44,6 +45,8 @@ Map<String, dynamic> _$$ReportModelImplToJson(_$ReportModelImpl instance) =>
       'category': instance.category,
       'location': instance.location,
       'images': instance.images,
+      'likes_count': instance.likesCount,
+      'is_liked': instance.isLiked,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
     };

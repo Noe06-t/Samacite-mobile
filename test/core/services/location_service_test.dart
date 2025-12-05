@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:mobile_samacite/core/services/location_service.dart';
 
 // Générer les mocks : flutter pub run build_runner build --delete-conflicting-outputs

@@ -5,7 +5,7 @@ import 'package:mobile_samacite/core/errors/api_exception.dart';
 
 part 'auth_notifier.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AuthNotifier extends _$AuthNotifier {
   @override
   AuthState build() {
@@ -18,11 +18,14 @@ class AuthNotifier extends _$AuthNotifier {
     final token = await secureStorage.getToken();
 
     if (token != null) {
-      final dioService = ref.read(dioServiceProvider);
-      dioService.setToken(token);
+      // ⚠️ NE PAS charger le token automatiquement ici
+      // Cela empêche les nouveaux login de fonctionner avec un token expiré
+      // Le token sera chargé uniquement après un login réussi
+      print('[AuthNotifier] 🔑 Token trouvé dans le stockage (non chargé automatiquement)');
       // Ici, vous pourriez récupérer les infos utilisateur depuis le serveur
       // Pour l'instant, on reste en initial
     } else {
+      print('[AuthNotifier] ❌ Aucun token trouvé');
       state = const AuthState.unauthenticated();
     }
   }
@@ -129,6 +132,7 @@ class AuthNotifier extends _$AuthNotifier {
 
       print('[AuthNotifier] 🎉 Passage en état authenticated');
       state = AuthState.authenticated(response.user, response.token);
+      
       print('[AuthNotifier] ✅ Login terminé avec succès!');
     } on ApiException catch (e) {
       print('[AuthNotifier] ❌ ApiException capturée: ${e.message}');
@@ -141,6 +145,18 @@ class AuthNotifier extends _$AuthNotifier {
       print('[AuthNotifier] 📚 Stack trace: ${StackTrace.current}');
       state = AuthState.error('Erreur inattendue: $e');
     }
+  }
+
+  /// Met à jour les informations de l'utilisateur dans l'état
+  /// (après modification du profil)
+  void updateUser(user) {
+    state.whenOrNull(
+      authenticated: (currentUser, token) {
+        print('[AuthNotifier] 🔄 Mise à jour de l\'utilisateur');
+        state = AuthState.authenticated(user, token);
+        print('[AuthNotifier] ✅ Utilisateur mis à jour dans l\'état');
+      },
+    );
   }
 
   Future<void> logout() async {

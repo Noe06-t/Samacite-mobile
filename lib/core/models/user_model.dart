@@ -11,6 +11,7 @@ class UserModel with _$UserModel {
     required String prenom,
     String? email, // Email optionnel
     required String telephone, // Téléphone obligatoire
+    @JsonKey(name: 'photo_url') String? photoUrl, // Photo de profil
     @JsonKey(name: 'created_at') @Default(null) String? createdAt,
     @JsonKey(name: 'updated_at') @Default(null) String? updatedAt,
   }) = _UserModel;

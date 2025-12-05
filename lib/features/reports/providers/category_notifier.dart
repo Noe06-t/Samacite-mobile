@@ -20,16 +20,20 @@ class CategoryNotifier extends StateNotifier<AsyncValue<List<CategoryModel>>> {
   final CategoryRepository _repository;
 
   CategoryNotifier(this._repository) : super(const AsyncValue.loading()) {
+    print('[CategoryNotifier] 🚀 Constructor appelé - début chargement catégories');
     // Charger les catégories au démarrage
     loadCategories();
   }
 
   /// Charge les catégories depuis le repository (avec cache)
   Future<void> loadCategories({bool forceRefresh = false}) async {
+    print('[CategoryNotifier] 📞 loadCategories appelé (forceRefresh: $forceRefresh)');
     state = const AsyncValue.loading();
 
     state = await AsyncValue.guard(() async {
-      return await _repository.getCategories(forceRefresh: forceRefresh);
+      final result = await _repository.getCategories(forceRefresh: forceRefresh);
+      print('[CategoryNotifier] ✅ Catégories chargées: ${result.length}');
+      return result;
     });
   }
 

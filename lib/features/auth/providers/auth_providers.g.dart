@@ -21,15 +21,12 @@ String _$dioServiceHash() => r'889a9c3e81c87e81cf74a8045f600cdc31931ff2';
 final dioServiceProvider = Provider<DioService>.internal(
   dioService,
   name: r'dioServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$dioServiceHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$dioServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef DioServiceRef = ProviderRef<DioService>;
 String _$secureStorageServiceHash() =>
     r'28ef5a96de61720fa06a7ba59ceb572a1791b078';
@@ -40,17 +37,15 @@ String _$secureStorageServiceHash() =>
 @ProviderFor(secureStorageService)
 final secureStorageServiceProvider =
     AutoDisposeProvider<SecureStorageService>.internal(
-      secureStorageService,
-      name: r'secureStorageServiceProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$secureStorageServiceHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  secureStorageService,
+  name: r'secureStorageServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$secureStorageServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef SecureStorageServiceRef = AutoDisposeProviderRef<SecureStorageService>;
 String _$authRepositoryHash() => r'9dae2dbcb58cf3ecaee8a5589ecbebd080d43be2';
 
@@ -68,8 +63,6 @@ final authRepositoryProvider = AutoDisposeProvider<AuthRepository>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AuthRepositoryRef = AutoDisposeProviderRef<AuthRepository>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

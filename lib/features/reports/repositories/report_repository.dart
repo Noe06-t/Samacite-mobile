@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:mobile_samacite/core/models/report_model.dart';
+import 'package:hive/hive.dart';
+import 'package:mobile_samacite/core/models/report_model_hive.dart';
 import 'package:mobile_samacite/core/services/dio_service.dart';
 import 'package:mobile_samacite/core/constants/api_constants.dart';
 
@@ -8,6 +10,18 @@ import 'package:mobile_samacite/core/constants/api_constants.dart';
 /// Suit le pattern Repository du backend Laravel
 /// Utilise Dio pour toutes les requêtes API (spec.md)
 class ReportRepository {
+    // Nom des box Hive
+    static const String _reportsBoxName = 'reports_box';
+    static const String _reportCacheMetaKey = 'reports_meta';
+    static const Duration _ttl = Duration(seconds: 60); // TTL 60s (spec.md)
+
+    // Helper pour ouvrir la box Hive
+    Future<Box> _openReportsBox() async {
+      if (!Hive.isBoxOpen(_reportsBoxName)) {
+        return await Hive.openBox(_reportsBoxName);
+      }
+      return Hive.box(_reportsBoxName);
+    }
   final DioService _dioService;
 
   ReportRepository(this._dioService);
@@ -33,6 +47,15 @@ class ReportRepository {
 
       // Backend Laravel renvoie : { success, message, data: {...} }
       if (response.data['success'] == true) {
+        // Vider TOUT le cache Hive après création pour forcer le rechargement
+        print('[ReportRepository] ➕ Signalement créé - vidage complet du cache');
+        final box = await _openReportsBox();
+        // Supprimer toutes les clés de cache qui commencent par 'reports_'
+        final keysToDelete = box.keys.where((key) => key.toString().startsWith('reports_')).toList();
+        for (final key in keysToDelete) {
+          await box.delete(key);
+        }
+        print('[ReportRepository] 🗑️ ${keysToDelete.length} clés de cache supprimées');
         return ReportModel.fromJson(response.data['data']);
       } else {
         throw DioException(
@@ -129,11 +152,41 @@ class ReportRepository {
     }
   }
 
+  /// Génère une clé de cache unique basée sur les paramètres de requête
+  String _generateCacheKey({
+    int page = 1,
+    int perPage = 15,
+    String? status,
+    int? userId,
+    int? categoryId,
+    String? searchQuery,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) {
+    final parts = <String>[
+      'reports',
+      'page_$page',
+      'perPage_$perPage',
+      if (status != null && status.isNotEmpty) 'status_$status',
+      if (userId != null) 'userId_$userId',
+      if (categoryId != null) 'categoryId_$categoryId',
+      if (searchQuery != null && searchQuery.isNotEmpty) 'search_$searchQuery',
+      if (startDate != null) 'startDate_${startDate.toIso8601String().split('T')[0]}',
+      if (endDate != null) 'endDate_${endDate.toIso8601String().split('T')[0]}',
+    ];
+    return parts.join('_');
+  }
+
   /// Récupère la liste paginée des signalements
   /// 
   /// [page] : Numéro de page (défaut: 1)
   /// [perPage] : Nombre d'éléments par page (défaut: 15)
   /// [status] : Filtre par statut ('pending', 'in_progress', 'resolved')
+  /// [userId] : Filtre par utilisateur (pour "Mes signalements")
+  /// [categoryId] : Filtre par catégorie
+  /// [searchQuery] : Recherche textuelle (titre ou description)
+  /// [startDate] : Date de début pour filtre par plage
+  /// [endDate] : Date de fin pour filtre par plage
   /// [includeRelations] : Relations à charger (user, category, images)
   /// 
   /// Retourne une Map avec :
@@ -143,39 +196,160 @@ class ReportRepository {
     int page = 1,
     int perPage = 15,
     String? status,
+    int? userId,
+    int? categoryId,
+    String? searchQuery,
+    DateTime? startDate,
+    DateTime? endDate,
     List<String>? includeRelations,
   }) async {
+    print('[ReportRepository] 🔍 getReports appelé');
+    
+    // Générer une clé de cache unique pour cette combinaison de filtres
+    final cacheKey = _generateCacheKey(
+      page: page,
+      perPage: perPage,
+      status: status,
+      userId: userId,
+      categoryId: categoryId,
+      searchQuery: searchQuery,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    print('[ReportRepository] 🔑 Clé de cache: $cacheKey');
+    
+    final box = await _openReportsBox();
+    final now = DateTime.now();
+    final cacheMeta = box.get(cacheKey);
+    final cacheTime = cacheMeta != null ? DateTime.tryParse(cacheMeta['timestamp'] ?? '') : null;
+    final isCacheValid = cacheTime != null && now.difference(cacheTime) < _ttl;
+    
+    print('[ReportRepository] 📊 Cache check: meta=$cacheMeta');
+    print('[ReportRepository] 📊 Cache time: $cacheTime, now: $now');
+    print('[ReportRepository] 📊 TTL diff: ${cacheTime != null ? now.difference(cacheTime).inSeconds : "N/A"}s, valid: $isCacheValid');
+
+    // Si cache valide, retourner les données locales
+    if (isCacheValid) {
+      print('[ReportRepository] ✅ CACHE HIT - Lecture depuis Hive');
+      final cachedData = cacheMeta?['data'] as List?;
+      if (cachedData != null) {
+        final cachedReports = cachedData
+            .map((item) => ReportModel.fromJson(Map<String, dynamic>.from(item as Map)))
+            .toList();
+        final meta = cacheMeta?['meta'] ?? {};
+        print('[ReportRepository] ✅ Retour cache: ${cachedReports.length} reports');
+        return {
+          'data': cachedReports,
+          'meta': meta,
+          'source': 'cache',
+        };
+      }
+    }
+
+    // Sinon, requête API et mise à jour du cache
+    print('[ReportRepository] ⚠️ CACHE MISS - Appel API');
     try {
-      // Construction des query params
+      // ...existing code for API request and parsing...
       final queryParams = <String, dynamic>{
         'page': page,
         'per_page': perPage,
       };
-
+      
+      // Filtres spec.md Phase 3
       if (status != null && status.isNotEmpty) {
-        queryParams['status'] = status;
+        queryParams['filter[status]'] = status;
       }
-
-      // Eager-loading pour éviter N+1 (spec.md - Backend Repository Pattern)
+      if (userId != null) {
+        queryParams['user_id'] = userId;
+      }
+      if (categoryId != null) {
+        queryParams['filter[category_id]'] = categoryId.toString();
+      }
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        queryParams['search'] = searchQuery;
+      }
+      if (startDate != null) {
+        queryParams['filter[start_date]'] = startDate.toIso8601String().split('T')[0];
+      }
+      if (endDate != null) {
+        queryParams['filter[end_date]'] = endDate.toIso8601String().split('T')[0];
+      }
+      
       if (includeRelations != null && includeRelations.isNotEmpty) {
         queryParams['include'] = includeRelations.join(',');
       }
-
       final response = await _dioService.dio.get(
         ApiConstants.reports,
         queryParameters: queryParams,
       );
-
       if (response.data['success'] == true) {
-        // Parser la liste de reports
-        final reportsJson = response.data['data']['data'] as List;
-        final reports = reportsJson
-            .map((json) => ReportModel.fromJson(json))
-            .toList();
-
+        // ...existing code for parsing reportsJson and meta...
+        final dataField = response.data['data'];
+        final List reportsJson;
+        final Map<String, dynamic> meta;
+        if (dataField is Map && dataField.containsKey('data')) {
+          reportsJson = dataField['data'] as List;
+          meta = {
+            'current_page': dataField['current_page'] ?? page,
+            'last_page': dataField['last_page'] ?? page,
+            'per_page': dataField['per_page'] ?? perPage,
+            'total': dataField['total'] ?? reportsJson.length,
+          };
+        } else if (dataField is List) {
+          reportsJson = dataField;
+          meta = {
+            'current_page': page,
+            'last_page': page,
+            'per_page': perPage,
+            'total': reportsJson.length,
+          };
+        } else {
+          throw Exception('Format de données inattendu: ${dataField.runtimeType}');
+        }
+        final reports = reportsJson.map((json) {
+          // ...existing code for parsing each report...
+          if (json['images'] != null && json['images'] is List) {
+            final imagesList = json['images'] as List;
+            json['images'] = imagesList.map((img) {
+              if (img is Map && img.containsKey('image_url')) {
+                return img['image_url'] as String;
+              }
+              return img.toString();
+            }).toList();
+          } else {
+            json['images'] = [];
+          }
+          if (json['latitude'] != null && json['longitude'] != null) {
+            final lat = json['latitude'] is String ? double.parse(json['latitude']) : json['latitude'];
+            final lng = json['longitude'] is String ? double.parse(json['longitude']) : json['longitude'];
+            json['location'] = {
+              'latitude': lat,
+              'longitude': lng,
+              'address': json['address'],
+            };
+          }
+          return ReportModel.fromJson(json);
+        }).toList();
+        
+        // Mettre à jour le cache Hive avec clé spécifique aux filtres
+        // Convertir en JSON pur (sans objets Freezed) pour Hive
+        final jsonData = reportsJson.map((json) {
+          // Copier les données brutes JSON du backend (déjà en format pur)
+          return Map<String, dynamic>.from(json as Map);
+        }).toList();
+        
+        await box.put(cacheKey, {
+          'timestamp': now.toIso8601String(),
+          'meta': meta,
+          'data': jsonData,
+        });
+        
+        print('[ReportRepository] 💾 Cache mis à jour avec clé: $cacheKey');
+        
         return {
           'data': reports,
-          'meta': response.data['data']['meta'] ?? {},
+          'meta': meta,
+          'source': 'api',
         };
       } else {
         throw DioException(
@@ -203,20 +377,56 @@ class ReportRepository {
     int id, {
     List<String>? includeRelations,
   }) async {
+    final box = await _openReportsBox();
+    final cachedReport = box.get(id);
+    final cacheMeta = box.get(_reportCacheMetaKey);
+    final cacheTime = cacheMeta != null ? DateTime.tryParse(cacheMeta['timestamp'] ?? '') : null;
+    final now = DateTime.now();
+    final isCacheValid = cacheTime != null && now.difference(cacheTime) < _ttl;
+
+    // Si cache valide et report trouvé, retourner local
+    if (isCacheValid && cachedReport != null && cachedReport is ReportModelHive) {
+      return cachedReport.toReportModel();
+    }
+
+    // Sinon, requête API et mise à jour du cache
     try {
       final queryParams = <String, dynamic>{};
-
       if (includeRelations != null && includeRelations.isNotEmpty) {
         queryParams['include'] = includeRelations.join(',');
       }
-
       final response = await _dioService.dio.get(
         '${ApiConstants.reports}/$id',
         queryParameters: queryParams,
       );
-
       if (response.data['success'] == true) {
-        return ReportModel.fromJson(response.data['data']);
+        final originalJson = response.data['data'] as Map<String, dynamic>;
+        final json = Map<String, dynamic>.from(originalJson);
+        if (json['images'] != null && json['images'] is List) {
+          final imagesList = json['images'] as List;
+          json['images'] = imagesList.map((img) {
+            if (img is Map && img.containsKey('image_url')) {
+              return img['image_url'] as String;
+            }
+            return img.toString();
+          }).toList();
+        } else {
+          json['images'] = [];
+        }
+        if (json['latitude'] != null && json['longitude'] != null) {
+          final lat = json['latitude'] is String ? double.parse(json['latitude']) : json['latitude'];
+          final lng = json['longitude'] is String ? double.parse(json['longitude']) : json['longitude'];
+          json['location'] = {
+            'latitude': lat,
+            'longitude': lng,
+            'address': json['address'],
+          };
+        }
+        final report = ReportModel.fromJson(json);
+        // Mettre à jour le cache Hive
+        final hiveReport = ReportModelHive.fromReportModel(report);
+        await box.put(hiveReport.id, hiveReport);
+        return report;
       } else {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -247,6 +457,15 @@ class ReportRepository {
       );
 
       if (response.data['success'] == true) {
+        // Vider TOUT le cache Hive après mise à jour pour forcer le rechargement
+        print('[ReportRepository] 🔄 Statut mis à jour - vidage complet du cache');
+        final box = await _openReportsBox();
+        // Supprimer toutes les clés de cache qui commencent par 'reports_'
+        final keysToDelete = box.keys.where((key) => key.toString().startsWith('reports_')).toList();
+        for (final key in keysToDelete) {
+          await box.delete(key);
+        }
+        print('[ReportRepository] 🗑️ ${keysToDelete.length} clés de cache supprimées');
         return ReportModel.fromJson(response.data['data']);
       } else {
         throw DioException(
@@ -281,6 +500,16 @@ class ReportRepository {
           message: response.data['message'] ?? 'Erreur suppression',
         );
       }
+
+      // Vider TOUT le cache Hive après suppression pour forcer le rechargement
+      print('[ReportRepository] 🗑️ Signalement supprimé - vidage complet du cache');
+      final box = await _openReportsBox();
+      // Supprimer toutes les clés de cache qui commencent par 'reports_'
+      final keysToDelete = box.keys.where((key) => key.toString().startsWith('reports_')).toList();
+      for (final key in keysToDelete) {
+        await box.delete(key);
+      }
+      print('[ReportRepository] 🗑️ ${keysToDelete.length} clés de cache supprimées');
     } on DioException {
       rethrow;
     } catch (e) {

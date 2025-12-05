@@ -2,6 +2,77 @@
 
 Toutes les modifications notables de ce projet seront documentées dans ce fichier.
 
+## [1.1.0] - 2025-01-XX - 🤖 Analyse IA Automatique
+
+### 🤖 Nouvelles fonctionnalités majeures
+
+#### Analyse IA des photos de signalements
+- **Auto-analyse intelligente** : Après ajout de la première photo, l'IA analyse automatiquement l'image
+- **Pré-remplissage automatique** : Génère titre, description et catégorie automatiquement
+- **Bouton réanalyse** : Permet de relancer l'analyse si résultat insatisfaisant
+- **Feedback temps réel** : Indicateur visuel "🤖 Analyse IA en cours..."
+- **Gestion d'erreurs robuste** : Fallback manuel si l'analyse échoue
+
+#### Interface utilisateur améliorée
+- Indicateur d'analyse avec spinner orange (#FFA000)
+- SnackBars de feedback : succès (vert), erreur (orange)
+- Bouton "Réanalyser avec IA" avec icône ✨
+- Auto-remplissage des champs après analyse réussie
+
+### 🔧 Modifications techniques
+
+#### Nouveaux fichiers
+- `lib/core/services/ai_analysis_service.dart` - Service Dio pour analyse IA
+- `AI_BACKEND_IMPLEMENTATION.md` - Guide implémentation Laravel + Gemini
+- `AI_FEATURE_GUIDE.md` - Documentation complète fonctionnalité IA
+- `CONFIGURATION.md` - Guide configuration environnement
+
+#### Fichiers modifiés
+- `report_state.dart` : Ajout champs `isAnalyzing`, `aiAnalysisResult`, `aiAnalysisError`
+- `report_notifier.dart` : Méthodes `analyzeImageWithAI()` et `clearAIAnalysis()`
+- `create_report_page.dart` : UI analyse IA + listener pré-remplissage
+- `map_page.dart` : Correction build_runner
+
+### ✅ Validation améliorée
+
+**Changements majeurs :**
+- Photo : **Obligatoire** (minimum 1) - Avant : facultative
+- Description : **Facultative** - Avant : obligatoire
+
+Justification : L'IA génère la description automatiquement.
+
+### 🐛 Corrections de bugs
+- Profile page : Boutons navigation maintenant fonctionnels
+- Map page : Correction caractères invisibles
+- Validation : Photo obligatoire avant soumission
+
+### 📚 Documentation
+- 3 nouveaux guides Markdown (~1200 lignes)
+- Guide obtention clé API Gemini gratuite
+- Configuration .env backend complète
+- Checklist configuration + debugging
+
+### 🚀 Backend requis
+
+**Endpoint Laravel à implémenter :**
+```
+POST /api/ai/analyze-image
+Content-Type: multipart/form-data
+Auth: Bearer token
+```
+
+Voir `AI_BACKEND_IMPLEMENTATION.md` pour code complet.
+
+**Configuration .env :**
+```env
+GEMINI_API_KEY=AIzaSy...
+```
+
+### 📊 Workflow utilisateur simplifié
+```
+Prendre photo → ⏳ Analyse IA → ✨ Pré-remplissage → Vérifier → Soumettre
+```
+
 ## [1.0.0] - 2025-11-21
 
 ### ✨ Ajouté

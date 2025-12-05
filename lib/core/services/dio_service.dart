@@ -1,6 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_samacite/core/constants/api_constants.dart';
 import 'package:logger/logger.dart';
+
+/// Provider pour DioService
+final dioServiceProvider = Provider<DioService>((ref) {
+  return DioService();
+});
 
 /// Service Dio pour gérer toutes les requêtes API
 class DioService {
@@ -12,7 +18,8 @@ class DioService {
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
         connectTimeout: ApiConstants.connectTimeout,
-        receiveTimeout: ApiConstants.receiveTimeout,
+        receiveTimeout: ApiConstants.receiveTimeout, // Utilise la constante (2 minutes)
+        sendTimeout: const Duration(minutes: 2),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',

@@ -110,18 +110,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 
                 // Logo
                 Center(
-                  child: Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary,
-                      borderRadius: BorderRadius.circular(48),
-                    ),
-                    child: const Icon(
-                      Icons.location_city,
-                      size: 48,
-                      color: AppColors.textOnSecondary,
-                    ),
+                  child: Image.asset(
+                    'assets/images/samacite_logo.jpg',
+                    width: 180,
+                    height: 180,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 

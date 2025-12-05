@@ -28,6 +28,10 @@ class ReportModel with _$ReportModel {
     // Images URLs (peut être une liste vide)
     @Default([]) List<String> images,
     
+    // Likes (Phase 4)
+    @JsonKey(name: 'likes_count') @Default(0) int likesCount,
+    @JsonKey(name: 'is_liked') @Default(false) bool isLiked,
+    
     @JsonKey(name: 'created_at') @Default(null) String? createdAt,
     @JsonKey(name: 'updated_at') @Default(null) String? updatedAt,
   }) = _ReportModel;

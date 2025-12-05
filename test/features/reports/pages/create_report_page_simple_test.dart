@@ -2,33 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_samacite/features/reports/pages/create_report_page.dart';
+import 'package:mobile_samacite/features/reports/providers/category_notifier.dart';
+import 'package:mobile_samacite/features/reports/providers/report_notifier.dart';
+import 'package:mobile_samacite/core/models/category_model.dart';
+import 'package:mobile_samacite/features/reports/repositories/report_repository.dart';
+import 'package:mobile_samacite/features/reports/repositories/category_repository.dart';
+import 'package:mobile_samacite/core/services/image_service.dart';
+import 'package:mobile_samacite/core/services/location_service.dart';
 
 /// Tests simplifiés de CreateReportPage
 /// Se concentre sur la structure UI et les widgets principaux
-/// Les tests complets nécessiteraient des mocks complexes des providers
+/// Mock des providers pour éviter les appels API réels
 void main() {
+  // Mock data
+  final mockCategories = [
+    const CategoryModel(id: 1, name: 'Voirie', description: 'Problèmes de voirie'),
+    const CategoryModel(id: 2, name: 'Éclairage', description: 'Problèmes d\'éclairage'),
+    const CategoryModel(id: 3, name: 'Propreté', description: 'Problèmes de propreté'),
+  ];
+
+  Widget createTestWidget() {
+    return ProviderScope(
+      overrides: [
+        categoryNotifierProvider.overrideWith((ref) {
+          final notifier = TestCategoryNotifier();
+          notifier.setTestState(AsyncValue.data(mockCategories));
+          return notifier;
+        }),
+        reportNotifierProvider.overrideWith((ref) {
+          return TestReportNotifier();
+        }),
+      ],
+      child: const MaterialApp(
+        home: CreateReportPage(),
+      ),
+    );
+  }
+
   group('CreateReportPage - Tests de structure UI', () {
     testWidgets('devrait créer le widget sans erreur', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
+
+      // Attendre que les animations se terminent
+      await tester.pumpAndSettle();
 
       // Vérifier que le widget se construit correctement
       expect(find.byType(CreateReportPage), findsOneWidget);
     });
 
     testWidgets('devrait afficher l\'AppBar avec le titre', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier présence AppBar et titre
@@ -37,13 +60,7 @@ void main() {
     });
 
     testWidgets('devrait afficher le formulaire principal', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier présence du formulaire
@@ -52,13 +69,7 @@ void main() {
     });
 
     testWidgets('devrait afficher les champs de texte principaux', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier les TextFormFields (Titre et Description)
@@ -68,13 +79,7 @@ void main() {
     });
 
     testWidgets('devrait afficher le dropdown catégorie', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier présence du dropdown catégorie (ou LinearProgressIndicator pendant le chargement)
@@ -85,13 +90,7 @@ void main() {
     });
 
     testWidgets('devrait afficher la section photos', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier présence de la section photos
@@ -100,13 +99,7 @@ void main() {
     });
 
     testWidgets('devrait afficher les boutons d\'ajout de photos', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier présence des boutons photos
@@ -115,13 +108,7 @@ void main() {
     });
 
     testWidgets('devrait afficher la section localisation', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier présence de la section localisation
@@ -130,13 +117,7 @@ void main() {
     });
 
     testWidgets('devrait afficher le bouton de soumission', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier présence du bouton soumettre
@@ -145,13 +126,7 @@ void main() {
     });
 
     testWidgets('devrait afficher les cards pour photos et localisation', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier présence de 2 Cards (Photos et Localisation)
@@ -159,13 +134,7 @@ void main() {
     });
 
     testWidgets('devrait permettre de saisir du texte dans le titre', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Trouver le premier TextFormField (titre)
@@ -179,13 +148,7 @@ void main() {
     });
 
     testWidgets('devrait permettre de saisir du texte dans la description', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Trouver le deuxième TextFormField (description)
@@ -202,13 +165,7 @@ void main() {
     });
 
     testWidgets('devrait avoir les bonnes couleurs de thème', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: CreateReportPage(),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       // Vérifier couleurs AppBar (vert #007A3F)
@@ -221,4 +178,65 @@ void main() {
       expect(elevatedButtons.length, greaterThanOrEqualTo(1));
     });
   });
+}
+
+// Test helpers - Mock Notifiers
+class TestReportNotifier extends ReportNotifier {
+  TestReportNotifier()
+      : super(
+          _FakeReportRepository(),
+          _FakeImageService(),
+          _FakeLocationService(),
+        );
+
+  @override
+  Future<void> selectImages() async {}
+
+  @override
+  Future<void> takePicture() async {}
+
+  @override
+  void removeImage(int index) {}
+
+  @override
+  Future<void> captureLocation() async {}
+
+  @override
+  Future<void> submitReport({
+    required String title,
+    required String description,
+    required int categoryId,
+  }) async {}
+}
+
+class TestCategoryNotifier extends CategoryNotifier {
+  TestCategoryNotifier() : super(_FakeCategoryRepository());
+
+  void setTestState(AsyncValue<List<CategoryModel>> testState) {
+    state = testState;
+  }
+
+  @override
+  Future<void> loadCategories({bool forceRefresh = false}) async {}
+}
+
+// Fake implementations
+class _FakeReportRepository implements ReportRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
+
+class _FakeImageService implements ImageService {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
+
+class _FakeLocationService implements LocationService {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
+}
+
+class _FakeCategoryRepository implements CategoryRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "370682369684",
+    "project_id": "samacite-mobile",
+    "storage_bucket": "samacite-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:370682369684:android:6f0b0aa5cfecc8ff1c4681",
+        "android_client_info": {
+          "package_name": "com.samacite.mobile_samacite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApinIV_UMcCR1AYSCEbBHre36yfwiydeI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

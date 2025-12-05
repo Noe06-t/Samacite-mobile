@@ -12,8 +12,7 @@ part of 'category_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 CategoryModel _$CategoryModelFromJson(Map<String, dynamic> json) {
   return _CategoryModel.fromJson(json);
@@ -31,12 +30,8 @@ mixin _$CategoryModel {
   @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
 
-  /// Serializes this CategoryModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CategoryModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CategoryModelCopyWith<CategoryModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -44,18 +39,16 @@ mixin _$CategoryModel {
 /// @nodoc
 abstract class $CategoryModelCopyWith<$Res> {
   factory $CategoryModelCopyWith(
-    CategoryModel value,
-    $Res Function(CategoryModel) then,
-  ) = _$CategoryModelCopyWithImpl<$Res, CategoryModel>;
+          CategoryModel value, $Res Function(CategoryModel) then) =
+      _$CategoryModelCopyWithImpl<$Res, CategoryModel>;
   @useResult
-  $Res call({
-    int id,
-    String name,
-    String? description,
-    String? icon,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
-  });
+  $Res call(
+      {int id,
+      String name,
+      String? description,
+      String? icon,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -68,8 +61,6 @@ class _$CategoryModelCopyWithImpl<$Res, $Val extends CategoryModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of CategoryModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -80,35 +71,32 @@ class _$CategoryModelCopyWithImpl<$Res, $Val extends CategoryModel>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as int,
-            name: null == name
-                ? _value.name
-                : name // ignore: cast_nullable_to_non_nullable
-                      as String,
-            description: freezed == description
-                ? _value.description
-                : description // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            icon: freezed == icon
-                ? _value.icon
-                : icon // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            createdAt: freezed == createdAt
-                ? _value.createdAt
-                : createdAt // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            updatedAt: freezed == updatedAt
-                ? _value.updatedAt
-                : updatedAt // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      icon: freezed == icon
+          ? _value.icon
+          : icon // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 }
 
@@ -116,19 +104,17 @@ class _$CategoryModelCopyWithImpl<$Res, $Val extends CategoryModel>
 abstract class _$$CategoryModelImplCopyWith<$Res>
     implements $CategoryModelCopyWith<$Res> {
   factory _$$CategoryModelImplCopyWith(
-    _$CategoryModelImpl value,
-    $Res Function(_$CategoryModelImpl) then,
-  ) = __$$CategoryModelImplCopyWithImpl<$Res>;
+          _$CategoryModelImpl value, $Res Function(_$CategoryModelImpl) then) =
+      __$$CategoryModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    int id,
-    String name,
-    String? description,
-    String? icon,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
-  });
+  $Res call(
+      {int id,
+      String name,
+      String? description,
+      String? icon,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -136,12 +122,9 @@ class __$$CategoryModelImplCopyWithImpl<$Res>
     extends _$CategoryModelCopyWithImpl<$Res, _$CategoryModelImpl>
     implements _$$CategoryModelImplCopyWith<$Res> {
   __$$CategoryModelImplCopyWithImpl(
-    _$CategoryModelImpl _value,
-    $Res Function(_$CategoryModelImpl) _then,
-  ) : super(_value, _then);
+      _$CategoryModelImpl _value, $Res Function(_$CategoryModelImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of CategoryModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -152,48 +135,45 @@ class __$$CategoryModelImplCopyWithImpl<$Res>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
-    return _then(
-      _$CategoryModelImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as int,
-        name: null == name
-            ? _value.name
-            : name // ignore: cast_nullable_to_non_nullable
-                  as String,
-        description: freezed == description
-            ? _value.description
-            : description // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        icon: freezed == icon
-            ? _value.icon
-            : icon // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        createdAt: freezed == createdAt
-            ? _value.createdAt
-            : createdAt // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        updatedAt: freezed == updatedAt
-            ? _value.updatedAt
-            : updatedAt // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
+    return _then(_$CategoryModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      icon: freezed == icon
+          ? _value.icon
+          : icon // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$CategoryModelImpl implements _CategoryModel {
-  const _$CategoryModelImpl({
-    required this.id,
-    required this.name,
-    this.description,
-    this.icon,
-    @JsonKey(name: 'created_at') this.createdAt = null,
-    @JsonKey(name: 'updated_at') this.updatedAt = null,
-  });
+  const _$CategoryModelImpl(
+      {required this.id,
+      required this.name,
+      this.description,
+      this.icon,
+      @JsonKey(name: 'created_at') this.createdAt = null,
+      @JsonKey(name: 'updated_at') this.updatedAt = null});
 
   factory _$CategoryModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$CategoryModelImplFromJson(json);
@@ -206,7 +186,7 @@ class _$CategoryModelImpl implements _CategoryModel {
   final String? description;
   @override
   final String? icon;
-  // Nom de l'icône (à mapper avec Icons Flutter)
+// Nom de l'icône (à mapper avec Icons Flutter)
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
@@ -235,21 +215,12 @@ class _$CategoryModelImpl implements _CategoryModel {
                 other.updatedAt == updatedAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    name,
-    description,
-    icon,
-    createdAt,
-    updatedAt,
-  );
+      runtimeType, id, name, description, icon, createdAt, updatedAt);
 
-  /// Create a copy of CategoryModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CategoryModelImplCopyWith<_$CategoryModelImpl> get copyWith =>
@@ -257,19 +228,21 @@ class _$CategoryModelImpl implements _CategoryModel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$CategoryModelImplToJson(this);
+    return _$$CategoryModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _CategoryModel implements CategoryModel {
-  const factory _CategoryModel({
-    required final int id,
-    required final String name,
-    final String? description,
-    final String? icon,
-    @JsonKey(name: 'created_at') final String? createdAt,
-    @JsonKey(name: 'updated_at') final String? updatedAt,
-  }) = _$CategoryModelImpl;
+  const factory _CategoryModel(
+          {required final int id,
+          required final String name,
+          final String? description,
+          final String? icon,
+          @JsonKey(name: 'created_at') final String? createdAt,
+          @JsonKey(name: 'updated_at') final String? updatedAt}) =
+      _$CategoryModelImpl;
 
   factory _CategoryModel.fromJson(Map<String, dynamic> json) =
       _$CategoryModelImpl.fromJson;
@@ -281,18 +254,15 @@ abstract class _CategoryModel implements CategoryModel {
   @override
   String? get description;
   @override
-  String? get icon; // Nom de l'icône (à mapper avec Icons Flutter)
-  @override
+  String? get icon;
+  @override // Nom de l'icône (à mapper avec Icons Flutter)
   @JsonKey(name: 'created_at')
   String? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
   String? get updatedAt;
-
-  /// Create a copy of CategoryModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CategoryModelImplCopyWith<_$CategoryModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

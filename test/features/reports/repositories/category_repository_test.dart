@@ -1,15 +1,39 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile_samacite/core/models/category_model.dart';
+import 'package:mobile_samacite/core/models/category_model_hive.dart';
 import 'package:mobile_samacite/features/reports/repositories/category_repository.dart';
 import 'package:mobile_samacite/core/services/dio_service.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'category_repository_test.mocks.dart';
 
+// Mock PathProvider
+class FakePathProviderPlatform extends Fake
+    with MockPlatformInterfaceMixin
+    implements PathProviderPlatform {
+  @override
+  Future<String?> getApplicationDocumentsPath() async => './';
+}
+
 @GenerateMocks([DioService, Dio])
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
+  setUpAll(() async {
+    PathProviderPlatform.instance = FakePathProviderPlatform();
+    Hive.init('./');
+    Hive.registerAdapter(CategoryModelHiveAdapter());
+  });
+  
+  tearDownAll(() async {
+    await Hive.close();
+  });
+  
   group('CategoryRepository Tests (TDD Phase 2)', () {
     late MockDioService mockDioService;
     late MockDio mockDio;

@@ -63,16 +63,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       
       next.maybeWhen(
         authenticated: (user, token) {
-          print('[LoginPage] \u2705 \u00c9tat: AUTHENTICATED');
-          print('[LoginPage] \ud83d\udc64 User: ${user.prenom} ${user.nom}');
-          print('[LoginPage] \ud83d\udd11 Token: ${token.substring(0, 20)}...');
-          
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Bienvenue ${user.prenom} ${user.nom} !'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          print('[LoginPage] ✅ État: AUTHENTICATED');
+          print('[LoginPage] 👤 User: ${user.prenom} ${user.nom}');
+          print('[LoginPage] 🔑 Token: ${token.substring(0, 20)}...');
           
           print('[LoginPage] 🧐 Navigation vers MainNavigationPage...');
           // Navigation vers MainNavigationPage
@@ -115,18 +108,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(
-                    child: Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary,
-                        borderRadius: BorderRadius.circular(48),
-                      ),
-                      child: const Icon(
-                        Icons.location_city,
-                        size: 48,
-                        color: AppColors.textOnSecondary,
-                      ),
+                    child: Image.asset(
+                      'assets/images/samacite_logo.jpg',
+                      width: 180,
+                      height: 180,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 24),

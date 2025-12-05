@@ -75,11 +75,12 @@ class LocationService {
     );
   }
 
-  /// Paramètres par défaut (haute précision)
+  /// Paramètres par défaut (équilibre précision/vitesse)
   LocationSettings getDefaultSettings() {
     return const LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 10, // Mise à jour tous les 10 mètres
+      timeLimit: Duration(seconds: 10), // Timeout de 10 secondes
     );
   }
 

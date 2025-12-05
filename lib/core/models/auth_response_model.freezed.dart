@@ -12,8 +12,7 @@ part of 'auth_response_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 AuthResponseModel _$AuthResponseModelFromJson(Map<String, dynamic> json) {
   return _AuthResponseModel.fromJson(json);
@@ -26,12 +25,8 @@ mixin _$AuthResponseModel {
   @JsonKey(name: 'token_type')
   String? get tokenType => throw _privateConstructorUsedError;
 
-  /// Serializes this AuthResponseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $AuthResponseModelCopyWith<AuthResponseModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -39,15 +34,13 @@ mixin _$AuthResponseModel {
 /// @nodoc
 abstract class $AuthResponseModelCopyWith<$Res> {
   factory $AuthResponseModelCopyWith(
-    AuthResponseModel value,
-    $Res Function(AuthResponseModel) then,
-  ) = _$AuthResponseModelCopyWithImpl<$Res, AuthResponseModel>;
+          AuthResponseModel value, $Res Function(AuthResponseModel) then) =
+      _$AuthResponseModelCopyWithImpl<$Res, AuthResponseModel>;
   @useResult
-  $Res call({
-    UserModel user,
-    String token,
-    @JsonKey(name: 'token_type') String? tokenType,
-  });
+  $Res call(
+      {UserModel user,
+      String token,
+      @JsonKey(name: 'token_type') String? tokenType});
 
   $UserModelCopyWith<$Res> get user;
 }
@@ -62,8 +55,6 @@ class _$AuthResponseModelCopyWithImpl<$Res, $Val extends AuthResponseModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -71,27 +62,22 @@ class _$AuthResponseModelCopyWithImpl<$Res, $Val extends AuthResponseModel>
     Object? token = null,
     Object? tokenType = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            user: null == user
-                ? _value.user
-                : user // ignore: cast_nullable_to_non_nullable
-                      as UserModel,
-            token: null == token
-                ? _value.token
-                : token // ignore: cast_nullable_to_non_nullable
-                      as String,
-            tokenType: freezed == tokenType
-                ? _value.tokenType
-                : tokenType // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      user: null == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as UserModel,
+      token: null == token
+          ? _value.token
+          : token // ignore: cast_nullable_to_non_nullable
+              as String,
+      tokenType: freezed == tokenType
+          ? _value.tokenType
+          : tokenType // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $UserModelCopyWith<$Res> get user {
@@ -104,17 +90,15 @@ class _$AuthResponseModelCopyWithImpl<$Res, $Val extends AuthResponseModel>
 /// @nodoc
 abstract class _$$AuthResponseModelImplCopyWith<$Res>
     implements $AuthResponseModelCopyWith<$Res> {
-  factory _$$AuthResponseModelImplCopyWith(
-    _$AuthResponseModelImpl value,
-    $Res Function(_$AuthResponseModelImpl) then,
-  ) = __$$AuthResponseModelImplCopyWithImpl<$Res>;
+  factory _$$AuthResponseModelImplCopyWith(_$AuthResponseModelImpl value,
+          $Res Function(_$AuthResponseModelImpl) then) =
+      __$$AuthResponseModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    UserModel user,
-    String token,
-    @JsonKey(name: 'token_type') String? tokenType,
-  });
+  $Res call(
+      {UserModel user,
+      String token,
+      @JsonKey(name: 'token_type') String? tokenType});
 
   @override
   $UserModelCopyWith<$Res> get user;
@@ -124,13 +108,10 @@ abstract class _$$AuthResponseModelImplCopyWith<$Res>
 class __$$AuthResponseModelImplCopyWithImpl<$Res>
     extends _$AuthResponseModelCopyWithImpl<$Res, _$AuthResponseModelImpl>
     implements _$$AuthResponseModelImplCopyWith<$Res> {
-  __$$AuthResponseModelImplCopyWithImpl(
-    _$AuthResponseModelImpl _value,
-    $Res Function(_$AuthResponseModelImpl) _then,
-  ) : super(_value, _then);
+  __$$AuthResponseModelImplCopyWithImpl(_$AuthResponseModelImpl _value,
+      $Res Function(_$AuthResponseModelImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -138,33 +119,30 @@ class __$$AuthResponseModelImplCopyWithImpl<$Res>
     Object? token = null,
     Object? tokenType = freezed,
   }) {
-    return _then(
-      _$AuthResponseModelImpl(
-        user: null == user
-            ? _value.user
-            : user // ignore: cast_nullable_to_non_nullable
-                  as UserModel,
-        token: null == token
-            ? _value.token
-            : token // ignore: cast_nullable_to_non_nullable
-                  as String,
-        tokenType: freezed == tokenType
-            ? _value.tokenType
-            : tokenType // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
+    return _then(_$AuthResponseModelImpl(
+      user: null == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as UserModel,
+      token: null == token
+          ? _value.token
+          : token // ignore: cast_nullable_to_non_nullable
+              as String,
+      tokenType: freezed == tokenType
+          ? _value.tokenType
+          : tokenType // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$AuthResponseModelImpl implements _AuthResponseModel {
-  const _$AuthResponseModelImpl({
-    required this.user,
-    required this.token,
-    @JsonKey(name: 'token_type') this.tokenType = null,
-  });
+  const _$AuthResponseModelImpl(
+      {required this.user,
+      required this.token,
+      @JsonKey(name: 'token_type') this.tokenType = null});
 
   factory _$AuthResponseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$AuthResponseModelImplFromJson(json);
@@ -193,33 +171,31 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
                 other.tokenType == tokenType));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, user, token, tokenType);
 
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$AuthResponseModelImplCopyWith<_$AuthResponseModelImpl> get copyWith =>
       __$$AuthResponseModelImplCopyWithImpl<_$AuthResponseModelImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AuthResponseModelImplToJson(this);
+    return _$$AuthResponseModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _AuthResponseModel implements AuthResponseModel {
-  const factory _AuthResponseModel({
-    required final UserModel user,
-    required final String token,
-    @JsonKey(name: 'token_type') final String? tokenType,
-  }) = _$AuthResponseModelImpl;
+  const factory _AuthResponseModel(
+          {required final UserModel user,
+          required final String token,
+          @JsonKey(name: 'token_type') final String? tokenType}) =
+      _$AuthResponseModelImpl;
 
   factory _AuthResponseModel.fromJson(Map<String, dynamic> json) =
       _$AuthResponseModelImpl.fromJson;
@@ -231,11 +207,8 @@ abstract class _AuthResponseModel implements AuthResponseModel {
   @override
   @JsonKey(name: 'token_type')
   String? get tokenType;
-
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$AuthResponseModelImplCopyWith<_$AuthResponseModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

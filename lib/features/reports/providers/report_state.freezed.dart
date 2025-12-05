@@ -12,8 +12,7 @@ part of 'report_state.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$ReportState {
@@ -23,11 +22,13 @@ mixin _$ReportState {
   bool get isLoadingLocation => throw _privateConstructorUsedError;
   String? get locationError => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
-  ReportModel? get createdReport => throw _privateConstructorUsedError;
+  ReportModel? get createdReport =>
+      throw _privateConstructorUsedError; // Analyse IA
+  bool get isAnalyzing => throw _privateConstructorUsedError;
+  AIAnalysisResult? get aiAnalysisResult => throw _privateConstructorUsedError;
+  String? get aiAnalysisError => throw _privateConstructorUsedError;
 
-  /// Create a copy of ReportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $ReportStateCopyWith<ReportState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -35,19 +36,20 @@ mixin _$ReportState {
 /// @nodoc
 abstract class $ReportStateCopyWith<$Res> {
   factory $ReportStateCopyWith(
-    ReportState value,
-    $Res Function(ReportState) then,
-  ) = _$ReportStateCopyWithImpl<$Res, ReportState>;
+          ReportState value, $Res Function(ReportState) then) =
+      _$ReportStateCopyWithImpl<$Res, ReportState>;
   @useResult
-  $Res call({
-    ReportStatus status,
-    List<XFile> selectedImages,
-    Position? position,
-    bool isLoadingLocation,
-    String? locationError,
-    String? errorMessage,
-    ReportModel? createdReport,
-  });
+  $Res call(
+      {ReportStatus status,
+      List<XFile> selectedImages,
+      Position? position,
+      bool isLoadingLocation,
+      String? locationError,
+      String? errorMessage,
+      ReportModel? createdReport,
+      bool isAnalyzing,
+      AIAnalysisResult? aiAnalysisResult,
+      String? aiAnalysisError});
 
   $ReportModelCopyWith<$Res>? get createdReport;
 }
@@ -62,8 +64,6 @@ class _$ReportStateCopyWithImpl<$Res, $Val extends ReportState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of ReportState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -74,44 +74,54 @@ class _$ReportStateCopyWithImpl<$Res, $Val extends ReportState>
     Object? locationError = freezed,
     Object? errorMessage = freezed,
     Object? createdReport = freezed,
+    Object? isAnalyzing = null,
+    Object? aiAnalysisResult = freezed,
+    Object? aiAnalysisError = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as ReportStatus,
-            selectedImages: null == selectedImages
-                ? _value.selectedImages
-                : selectedImages // ignore: cast_nullable_to_non_nullable
-                      as List<XFile>,
-            position: freezed == position
-                ? _value.position
-                : position // ignore: cast_nullable_to_non_nullable
-                      as Position?,
-            isLoadingLocation: null == isLoadingLocation
-                ? _value.isLoadingLocation
-                : isLoadingLocation // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            locationError: freezed == locationError
-                ? _value.locationError
-                : locationError // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            errorMessage: freezed == errorMessage
-                ? _value.errorMessage
-                : errorMessage // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            createdReport: freezed == createdReport
-                ? _value.createdReport
-                : createdReport // ignore: cast_nullable_to_non_nullable
-                      as ReportModel?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as ReportStatus,
+      selectedImages: null == selectedImages
+          ? _value.selectedImages
+          : selectedImages // ignore: cast_nullable_to_non_nullable
+              as List<XFile>,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as Position?,
+      isLoadingLocation: null == isLoadingLocation
+          ? _value.isLoadingLocation
+          : isLoadingLocation // ignore: cast_nullable_to_non_nullable
+              as bool,
+      locationError: freezed == locationError
+          ? _value.locationError
+          : locationError // ignore: cast_nullable_to_non_nullable
+              as String?,
+      errorMessage: freezed == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdReport: freezed == createdReport
+          ? _value.createdReport
+          : createdReport // ignore: cast_nullable_to_non_nullable
+              as ReportModel?,
+      isAnalyzing: null == isAnalyzing
+          ? _value.isAnalyzing
+          : isAnalyzing // ignore: cast_nullable_to_non_nullable
+              as bool,
+      aiAnalysisResult: freezed == aiAnalysisResult
+          ? _value.aiAnalysisResult
+          : aiAnalysisResult // ignore: cast_nullable_to_non_nullable
+              as AIAnalysisResult?,
+      aiAnalysisError: freezed == aiAnalysisError
+          ? _value.aiAnalysisError
+          : aiAnalysisError // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 
-  /// Create a copy of ReportState
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $ReportModelCopyWith<$Res>? get createdReport {
@@ -129,20 +139,21 @@ class _$ReportStateCopyWithImpl<$Res, $Val extends ReportState>
 abstract class _$$ReportStateImplCopyWith<$Res>
     implements $ReportStateCopyWith<$Res> {
   factory _$$ReportStateImplCopyWith(
-    _$ReportStateImpl value,
-    $Res Function(_$ReportStateImpl) then,
-  ) = __$$ReportStateImplCopyWithImpl<$Res>;
+          _$ReportStateImpl value, $Res Function(_$ReportStateImpl) then) =
+      __$$ReportStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    ReportStatus status,
-    List<XFile> selectedImages,
-    Position? position,
-    bool isLoadingLocation,
-    String? locationError,
-    String? errorMessage,
-    ReportModel? createdReport,
-  });
+  $Res call(
+      {ReportStatus status,
+      List<XFile> selectedImages,
+      Position? position,
+      bool isLoadingLocation,
+      String? locationError,
+      String? errorMessage,
+      ReportModel? createdReport,
+      bool isAnalyzing,
+      AIAnalysisResult? aiAnalysisResult,
+      String? aiAnalysisError});
 
   @override
   $ReportModelCopyWith<$Res>? get createdReport;
@@ -153,12 +164,9 @@ class __$$ReportStateImplCopyWithImpl<$Res>
     extends _$ReportStateCopyWithImpl<$Res, _$ReportStateImpl>
     implements _$$ReportStateImplCopyWith<$Res> {
   __$$ReportStateImplCopyWithImpl(
-    _$ReportStateImpl _value,
-    $Res Function(_$ReportStateImpl) _then,
-  ) : super(_value, _then);
+      _$ReportStateImpl _value, $Res Function(_$ReportStateImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of ReportState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -169,54 +177,70 @@ class __$$ReportStateImplCopyWithImpl<$Res>
     Object? locationError = freezed,
     Object? errorMessage = freezed,
     Object? createdReport = freezed,
+    Object? isAnalyzing = null,
+    Object? aiAnalysisResult = freezed,
+    Object? aiAnalysisError = freezed,
   }) {
-    return _then(
-      _$ReportStateImpl(
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as ReportStatus,
-        selectedImages: null == selectedImages
-            ? _value._selectedImages
-            : selectedImages // ignore: cast_nullable_to_non_nullable
-                  as List<XFile>,
-        position: freezed == position
-            ? _value.position
-            : position // ignore: cast_nullable_to_non_nullable
-                  as Position?,
-        isLoadingLocation: null == isLoadingLocation
-            ? _value.isLoadingLocation
-            : isLoadingLocation // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        locationError: freezed == locationError
-            ? _value.locationError
-            : locationError // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        errorMessage: freezed == errorMessage
-            ? _value.errorMessage
-            : errorMessage // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        createdReport: freezed == createdReport
-            ? _value.createdReport
-            : createdReport // ignore: cast_nullable_to_non_nullable
-                  as ReportModel?,
-      ),
-    );
+    return _then(_$ReportStateImpl(
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as ReportStatus,
+      selectedImages: null == selectedImages
+          ? _value._selectedImages
+          : selectedImages // ignore: cast_nullable_to_non_nullable
+              as List<XFile>,
+      position: freezed == position
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as Position?,
+      isLoadingLocation: null == isLoadingLocation
+          ? _value.isLoadingLocation
+          : isLoadingLocation // ignore: cast_nullable_to_non_nullable
+              as bool,
+      locationError: freezed == locationError
+          ? _value.locationError
+          : locationError // ignore: cast_nullable_to_non_nullable
+              as String?,
+      errorMessage: freezed == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdReport: freezed == createdReport
+          ? _value.createdReport
+          : createdReport // ignore: cast_nullable_to_non_nullable
+              as ReportModel?,
+      isAnalyzing: null == isAnalyzing
+          ? _value.isAnalyzing
+          : isAnalyzing // ignore: cast_nullable_to_non_nullable
+              as bool,
+      aiAnalysisResult: freezed == aiAnalysisResult
+          ? _value.aiAnalysisResult
+          : aiAnalysisResult // ignore: cast_nullable_to_non_nullable
+              as AIAnalysisResult?,
+      aiAnalysisError: freezed == aiAnalysisError
+          ? _value.aiAnalysisError
+          : aiAnalysisError // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
 /// @nodoc
 
 class _$ReportStateImpl implements _ReportState {
-  const _$ReportStateImpl({
-    this.status = ReportStatus.initial,
-    final List<XFile> selectedImages = const [],
-    this.position,
-    this.isLoadingLocation = false,
-    this.locationError,
-    this.errorMessage,
-    this.createdReport,
-  }) : _selectedImages = selectedImages;
+  const _$ReportStateImpl(
+      {this.status = ReportStatus.initial,
+      final List<XFile> selectedImages = const [],
+      this.position,
+      this.isLoadingLocation = false,
+      this.locationError,
+      this.errorMessage,
+      this.createdReport,
+      this.isAnalyzing = false,
+      this.aiAnalysisResult,
+      this.aiAnalysisError})
+      : _selectedImages = selectedImages;
 
   @override
   @JsonKey()
@@ -241,10 +265,18 @@ class _$ReportStateImpl implements _ReportState {
   final String? errorMessage;
   @override
   final ReportModel? createdReport;
+// Analyse IA
+  @override
+  @JsonKey()
+  final bool isAnalyzing;
+  @override
+  final AIAnalysisResult? aiAnalysisResult;
+  @override
+  final String? aiAnalysisError;
 
   @override
   String toString() {
-    return 'ReportState(status: $status, selectedImages: $selectedImages, position: $position, isLoadingLocation: $isLoadingLocation, locationError: $locationError, errorMessage: $errorMessage, createdReport: $createdReport)';
+    return 'ReportState(status: $status, selectedImages: $selectedImages, position: $position, isLoadingLocation: $isLoadingLocation, locationError: $locationError, errorMessage: $errorMessage, createdReport: $createdReport, isAnalyzing: $isAnalyzing, aiAnalysisResult: $aiAnalysisResult, aiAnalysisError: $aiAnalysisError)';
   }
 
   @override
@@ -253,10 +285,8 @@ class _$ReportStateImpl implements _ReportState {
         (other.runtimeType == runtimeType &&
             other is _$ReportStateImpl &&
             (identical(other.status, status) || other.status == status) &&
-            const DeepCollectionEquality().equals(
-              other._selectedImages,
-              _selectedImages,
-            ) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedImages, _selectedImages) &&
             (identical(other.position, position) ||
                 other.position == position) &&
             (identical(other.isLoadingLocation, isLoadingLocation) ||
@@ -266,24 +296,30 @@ class _$ReportStateImpl implements _ReportState {
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage) &&
             (identical(other.createdReport, createdReport) ||
-                other.createdReport == createdReport));
+                other.createdReport == createdReport) &&
+            (identical(other.isAnalyzing, isAnalyzing) ||
+                other.isAnalyzing == isAnalyzing) &&
+            (identical(other.aiAnalysisResult, aiAnalysisResult) ||
+                other.aiAnalysisResult == aiAnalysisResult) &&
+            (identical(other.aiAnalysisError, aiAnalysisError) ||
+                other.aiAnalysisError == aiAnalysisError));
   }
 
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    status,
-    const DeepCollectionEquality().hash(_selectedImages),
-    position,
-    isLoadingLocation,
-    locationError,
-    errorMessage,
-    createdReport,
-  );
+      runtimeType,
+      status,
+      const DeepCollectionEquality().hash(_selectedImages),
+      position,
+      isLoadingLocation,
+      locationError,
+      errorMessage,
+      createdReport,
+      isAnalyzing,
+      aiAnalysisResult,
+      aiAnalysisError);
 
-  /// Create a copy of ReportState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ReportStateImplCopyWith<_$ReportStateImpl> get copyWith =>
@@ -291,15 +327,17 @@ class _$ReportStateImpl implements _ReportState {
 }
 
 abstract class _ReportState implements ReportState {
-  const factory _ReportState({
-    final ReportStatus status,
-    final List<XFile> selectedImages,
-    final Position? position,
-    final bool isLoadingLocation,
-    final String? locationError,
-    final String? errorMessage,
-    final ReportModel? createdReport,
-  }) = _$ReportStateImpl;
+  const factory _ReportState(
+      {final ReportStatus status,
+      final List<XFile> selectedImages,
+      final Position? position,
+      final bool isLoadingLocation,
+      final String? locationError,
+      final String? errorMessage,
+      final ReportModel? createdReport,
+      final bool isAnalyzing,
+      final AIAnalysisResult? aiAnalysisResult,
+      final String? aiAnalysisError}) = _$ReportStateImpl;
 
   @override
   ReportStatus get status;
@@ -315,11 +353,14 @@ abstract class _ReportState implements ReportState {
   String? get errorMessage;
   @override
   ReportModel? get createdReport;
-
-  /// Create a copy of ReportState
-  /// with the given fields replaced by the non-null parameter values.
+  @override // Analyse IA
+  bool get isAnalyzing;
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  AIAnalysisResult? get aiAnalysisResult;
+  @override
+  String? get aiAnalysisError;
+  @override
+  @JsonKey(ignore: true)
   _$$ReportStateImplCopyWith<_$ReportStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
