@@ -289,9 +289,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
+      body: SafeArea(
+        bottom: true,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -482,6 +484,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

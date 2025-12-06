@@ -31,7 +31,9 @@ class ProfilePage extends ConsumerWidget {
 
     return Scaffold(
       body: authState.maybeWhen(
-        authenticated: (user, token) => SingleChildScrollView(
+        authenticated: (user, token) => SafeArea(
+          bottom: true,
+          child: SingleChildScrollView(
           child: Column(
             children: [
               // Header moderne avec avatar et dégradé
@@ -211,6 +213,7 @@ class ProfilePage extends ConsumerWidget {
                 ),
               ),
             ],
+          ),
           ),
         ),
         orElse: () => const Center(

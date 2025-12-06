@@ -117,7 +117,10 @@ class _NotificationListPageState extends ConsumerState<NotificationListPage> {
             ),
         ],
       ),
-      body: _buildBody(state),
+      body: SafeArea(
+        bottom: true,
+        child: _buildBody(state),
+      ),
     );
   }
 

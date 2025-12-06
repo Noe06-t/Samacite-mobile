@@ -89,9 +89,11 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
+      body: SafeArea(
+        bottom: true,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -205,19 +207,60 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
                 secondaryColor: Colors.white,
               ),
             ] else if (!reportState.isAnalyzing) ...[
-              // Bouton Changer de photo
+              // Boutons pour changer la source de photo
+              Row(
+                children: [
+                  Expanded(
+                    child: ModernButton(
+                      text: 'Appareil photo',
+                      icon: Icons.camera_alt,
+                      onPressed: () {
+                        ref.read(reportNotifierProvider.notifier).removeImage(0);
+                        Future.delayed(const Duration(milliseconds: 100), () {
+                          ref.read(reportNotifierProvider.notifier).takePicture();
+                        });
+                      },
+                      height: 56,
+                      primaryColor: const Color(0xFF007A3F),
+                      secondaryColor: const Color(0xFF00A854),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ModernButton(
+                      text: 'Galerie',
+                      icon: Icons.photo_library,
+                      onPressed: () {
+                        ref.read(reportNotifierProvider.notifier).removeImage(0);
+                        Future.delayed(const Duration(milliseconds: 100), () {
+                          ref.read(reportNotifierProvider.notifier).selectImages();
+                        });
+                      },
+                      height: 56,
+                      primaryColor: const Color(0xFFFFA000),
+                      secondaryColor: const Color(0xFFFF8C00),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Bouton Continuer sans changer
               ModernButton(
-                text: 'Changer de photo',
-                icon: Icons.refresh,
+                text: 'Continuer avec cette photo',
+                icon: Icons.arrow_forward,
                 onPressed: () {
-                  ref.read(reportNotifierProvider.notifier).removeImage(0);
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const CreateReportPage(),
+                    ),
+                  );
                 },
                 height: 56,
                 primaryColor: Colors.grey[700],
                 secondaryColor: Colors.grey[600],
               ),
             ],
-          ],
+          ),
         ),
       ),
     );

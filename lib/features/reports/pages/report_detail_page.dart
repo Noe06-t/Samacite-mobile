@@ -301,12 +301,14 @@ class ReportDetailContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Image principale (200dp height)
-          _buildMainImage(context),
+    return SafeArea(
+      bottom: true,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Image principale (200dp height)
+            _buildMainImage(context),
 
           // En-tête avec gradient
           Container(
@@ -452,14 +454,7 @@ class ReportDetailContent extends StatelessWidget {
                   iconColor: const Color(0xFFFFA000),
                   child: Column(
                     children: [
-                      // Map preview stylisé
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: _buildMapPreview(),
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      // Bouton moderne avec gradient
+                      // Bouton moderne avec gradient (sans preview map)
                       SizedBox(
                         width: double.infinity,
                         child: Container(
@@ -527,6 +522,7 @@ class ReportDetailContent extends StatelessWidget {
             currentUserId: report.userId,
           ),
         ],
+      ),
       ),
     );
   }
@@ -808,31 +804,6 @@ class ReportDetailContent extends StatelessWidget {
           'color': Colors.grey,
         };
     }
-  }
-
-  Widget _buildMapPreview() {
-    return Container(
-      height: 200,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.map, size: 48, color: Colors.grey),
-            SizedBox(height: 8),
-            Text(
-              'Aperçu de la carte',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   String _formatDate(String dateStr) {
