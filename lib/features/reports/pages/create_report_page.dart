@@ -152,12 +152,14 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
+      body: SafeArea(
+        bottom: true,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Aperçu de la photo
@@ -244,6 +246,7 @@ class _CreateReportPageState extends ConsumerState<CreateReportPage> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

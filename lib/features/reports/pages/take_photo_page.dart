@@ -90,25 +90,25 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
       ),
       body: SafeArea(
         bottom: true,
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: 20),
               // Icône principale
               Icon(
                 hasPhoto ? Icons.auto_awesome : Icons.camera_alt,
-                size: 120,
+                size: 100,
                 color: hasPhoto ? const Color(0xFFFFA000) : const Color(0xFF007A3F),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
               // Titre
               Text(
                 hasPhoto 
-                    ? '🤖 Analyse en cours...' 
-                    : '📸 Prenez une photo',
+                    ? 'Analyse en cours...' 
+                    : 'Prenez une photo',
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -116,7 +116,7 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Description
               Text(
@@ -124,13 +124,13 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
                     ? 'L\'intelligence artificielle analyse votre photo pour pré-remplir le formulaire'
                     : 'L\'IA analysera automatiquement votre photo et remplira le formulaire',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Colors.grey[700],
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
 
               // Indicateur de chargement si analyse en cours
               if (reportState.isAnalyzing) ...[
@@ -159,7 +159,7 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
               // Aperçu de la photo si elle existe
               if (hasPhoto && !reportState.isAnalyzing)
                 Container(
-                  height: 200,
+                  height: 180,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
@@ -179,7 +179,7 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
                   ),
                 ),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
 
               // Boutons
               if (!hasPhoto) ...[
