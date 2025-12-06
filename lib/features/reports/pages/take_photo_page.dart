@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_samacite/features/reports/providers/report_notifier.dart';
-import 'package:mobile_samacite/features/reports/providers/report_state.dart';
 import 'package:mobile_samacite/core/widgets/modern_button.dart';
 import 'package:mobile_samacite/features/reports/pages/create_report_page.dart';
 
@@ -81,7 +80,7 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.arrow_back_rounded, size: 20),
@@ -97,168 +96,169 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-            // Icône principale
-            Icon(
-              hasPhoto ? Icons.auto_awesome : Icons.camera_alt,
-              size: 120,
-              color: hasPhoto ? const Color(0xFFFFA000) : const Color(0xFF007A3F),
-            ),
-            const SizedBox(height: 32),
-
-            // Titre
-            Text(
-              hasPhoto 
-                  ? '🤖 Analyse en cours...' 
-                  : '📸 Prenez une photo',
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF007A3F),
+              // Icône principale
+              Icon(
+                hasPhoto ? Icons.auto_awesome : Icons.camera_alt,
+                size: 120,
+                color: hasPhoto ? const Color(0xFFFFA000) : const Color(0xFF007A3F),
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 32),
 
-            // Description
-            Text(
-              hasPhoto
-                  ? 'L\'intelligence artificielle analyse votre photo pour pré-remplir le formulaire'
-                  : 'L\'IA analysera automatiquement votre photo et remplira le formulaire',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[700],
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 48),
-
-            // Indicateur de chargement si analyse en cours
-            if (reportState.isAnalyzing) ...[
-              const Center(
-                child: SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 5,
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFA000)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
+              // Titre
               Text(
-                'Analyse en cours...\nCela peut prendre quelques secondes',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
+                hasPhoto 
+                    ? '🤖 Analyse en cours...' 
+                    : '📸 Prenez une photo',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF007A3F),
                 ),
                 textAlign: TextAlign.center,
               ),
-            ],
+              const SizedBox(height: 16),
 
-            // Aperçu de la photo si elle existe
-            if (hasPhoto && !reportState.isAnalyzing)
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+              // Description
+              Text(
+                hasPhoto
+                    ? 'L\'intelligence artificielle analyse votre photo pour pré-remplir le formulaire'
+                    : 'L\'IA analysera automatiquement votre photo et remplira le formulaire',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[700],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 48),
+
+              // Indicateur de chargement si analyse en cours
+              if (reportState.isAnalyzing) ...[
+                const Center(
+                  child: SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFA000)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Analyse en cours...\nCela peut prendre quelques secondes',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+
+              // Aperçu de la photo si elle existe
+              if (hasPhoto && !reportState.isAnalyzing)
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.file(
+                      File(reportState.selectedImages.first.path),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 48),
+
+              // Boutons
+              if (!hasPhoto) ...[
+                // Bouton Appareil photo
+                ModernButton(
+                  text: 'Appareil photo',
+                  icon: Icons.camera_alt,
+                  onPressed: () {
+                    ref.read(reportNotifierProvider.notifier).takePicture();
+                  },
+                  height: 56,
+                ),
+                const SizedBox(height: 16),
+
+                // Bouton Galerie
+                ModernButton(
+                  text: 'Galerie',
+                  icon: Icons.photo_library,
+                  onPressed: () {
+                    ref.read(reportNotifierProvider.notifier).selectImages();
+                  },
+                  height: 56,
+                  primaryColor: Colors.white,
+                  secondaryColor: Colors.white,
+                ),
+              ] else if (!reportState.isAnalyzing) ...[
+                // Boutons pour changer la source de photo
+                Row(
+                  children: [
+                    Expanded(
+                      child: ModernButton(
+                        text: 'Appareil photo',
+                        icon: Icons.camera_alt,
+                        onPressed: () {
+                          ref.read(reportNotifierProvider.notifier).removeImage(0);
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            ref.read(reportNotifierProvider.notifier).takePicture();
+                          });
+                        },
+                        height: 56,
+                        primaryColor: const Color(0xFF007A3F),
+                        secondaryColor: const Color(0xFF00A854),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ModernButton(
+                        text: 'Galerie',
+                        icon: Icons.photo_library,
+                        onPressed: () {
+                          ref.read(reportNotifierProvider.notifier).removeImage(0);
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            ref.read(reportNotifierProvider.notifier).selectImages();
+                          });
+                        },
+                        height: 56,
+                        primaryColor: const Color(0xFFFFA000),
+                        secondaryColor: const Color(0xFFFF8C00),
+                      ),
                     ),
                   ],
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.file(
-                    File(reportState.selectedImages.first.path),
-                    fit: BoxFit.cover,
-                  ),
+                const SizedBox(height: 16),
+                // Bouton Continuer sans changer
+                ModernButton(
+                  text: 'Continuer avec cette photo',
+                  icon: Icons.arrow_forward,
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const CreateReportPage(),
+                      ),
+                    );
+                  },
+                  height: 56,
+                  primaryColor: Colors.grey[700],
+                  secondaryColor: Colors.grey[600],
                 ),
-              ),
-
-            const SizedBox(height: 48),
-
-            // Boutons
-            if (!hasPhoto) ...[
-              // Bouton Appareil photo
-              ModernButton(
-                text: 'Appareil photo',
-                icon: Icons.camera_alt,
-                onPressed: () {
-                  ref.read(reportNotifierProvider.notifier).takePicture();
-                },
-                height: 56,
-              ),
-              const SizedBox(height: 16),
-
-              // Bouton Galerie
-              ModernButton(
-                text: 'Galerie',
-                icon: Icons.photo_library,
-                onPressed: () {
-                  ref.read(reportNotifierProvider.notifier).selectImages();
-                },
-                height: 56,
-                primaryColor: Colors.white,
-                secondaryColor: Colors.white,
-              ),
-            ] else if (!reportState.isAnalyzing) ...[
-              // Boutons pour changer la source de photo
-              Row(
-                children: [
-                  Expanded(
-                    child: ModernButton(
-                      text: 'Appareil photo',
-                      icon: Icons.camera_alt,
-                      onPressed: () {
-                        ref.read(reportNotifierProvider.notifier).removeImage(0);
-                        Future.delayed(const Duration(milliseconds: 100), () {
-                          ref.read(reportNotifierProvider.notifier).takePicture();
-                        });
-                      },
-                      height: 56,
-                      primaryColor: const Color(0xFF007A3F),
-                      secondaryColor: const Color(0xFF00A854),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ModernButton(
-                      text: 'Galerie',
-                      icon: Icons.photo_library,
-                      onPressed: () {
-                        ref.read(reportNotifierProvider.notifier).removeImage(0);
-                        Future.delayed(const Duration(milliseconds: 100), () {
-                          ref.read(reportNotifierProvider.notifier).selectImages();
-                        });
-                      },
-                      height: 56,
-                      primaryColor: const Color(0xFFFFA000),
-                      secondaryColor: const Color(0xFFFF8C00),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Bouton Continuer sans changer
-              ModernButton(
-                text: 'Continuer avec cette photo',
-                icon: Icons.arrow_forward,
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const CreateReportPage(),
-                    ),
-                  );
-                },
-                height: 56,
-                primaryColor: Colors.grey[700],
-                secondaryColor: Colors.grey[600],
-              ),
+              ],
             ],
           ),
         ),
