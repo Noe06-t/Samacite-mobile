@@ -191,19 +191,38 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
                     ref.read(reportNotifierProvider.notifier).takePicture();
                   },
                   height: 56,
+                  primaryColor: const Color(0xFF007A3F),
+                  secondaryColor: const Color(0xFF00A854),
                 ),
                 const SizedBox(height: 16),
 
                 // Bouton Galerie
-                ModernButton(
-                  text: 'Galerie',
-                  icon: Icons.photo_library,
+                OutlinedButton(
                   onPressed: () {
                     ref.read(reportNotifierProvider.notifier).selectImages();
                   },
-                  height: 56,
-                  primaryColor: const Color(0xFFFFA000),
-                  secondaryColor: const Color(0xFFFF8C00),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 56),
+                    side: const BorderSide(color: Color(0xFF007A3F), width: 2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.photo_library, color: Color(0xFF007A3F)),
+                      SizedBox(width: 12),
+                      Text(
+                        'Galerie',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF007A3F),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ] else if (!reportState.isAnalyzing) ...[
                 // Boutons pour changer la source de photo
