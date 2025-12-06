@@ -262,7 +262,6 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
             ],
           ),
         ),
-        ),
       ),
     );
   }
