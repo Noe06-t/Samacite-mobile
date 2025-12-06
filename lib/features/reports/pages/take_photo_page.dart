@@ -94,9 +94,9 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // Icône principale
             Icon(
               hasPhoto ? Icons.auto_awesome : Icons.camera_alt,
@@ -261,6 +261,7 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );
