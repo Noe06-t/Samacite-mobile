@@ -202,8 +202,8 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
                     ref.read(reportNotifierProvider.notifier).selectImages();
                   },
                   height: 56,
-                  primaryColor: Colors.white,
-                  secondaryColor: Colors.white,
+                  primaryColor: const Color(0xFFFFA000),
+                  secondaryColor: const Color(0xFFFF8C00),
                 ),
               ] else if (!reportState.isAnalyzing) ...[
                 // Boutons pour changer la source de photo
