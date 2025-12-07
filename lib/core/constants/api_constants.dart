@@ -1,8 +1,7 @@
 /// Constantes pour les endpoints API
 class ApiConstants {
-  // 🔧 Pour émulateur Android : 10.0.2.2 = localhost de la machine hôte
-  // 🔧 Pour device physique : remplacer par l'IP de votre PC (ex: 192.168.1.X)
-  static const String baseUrl = 'http://192.168.1.7:8000/api';
+  // 🌐 API Backend déployée sur artist-dev.com
+  static const String baseUrl = 'https://samacite.artist-dev.com/api';
   
   // Auth endpoints
   static const String login = '/auth/login';
