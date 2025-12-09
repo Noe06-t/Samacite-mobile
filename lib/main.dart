@@ -7,6 +7,7 @@ import 'package:mobile_samacite/core/models/category_model_hive.dart';
 import 'package:mobile_samacite/features/auth/pages/login_page.dart';
 import 'package:mobile_samacite/features/notifications/pages/notification_list_page.dart';
 import 'package:mobile_samacite/features/reports/pages/map_page.dart';
+import 'package:mobile_samacite/features/splash/splash_screen.dart';
 
 /// Point d'entrée principal de l'application
 /// 
@@ -52,10 +53,11 @@ class MyApp extends StatelessWidget {
         ),
       ),
       routes: {
+        '/login': (context) => const LoginPage(),
         '/map': (context) => const MapPage(),
         '/notifications': (context) => const NotificationListPage(),
       },
-      home: const LoginPage(),
+      home: const SplashScreen(),
     );
   }
 }

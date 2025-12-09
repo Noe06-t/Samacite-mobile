@@ -352,7 +352,7 @@ class ReportItemWidget extends StatelessWidget {
                         // Badge commentaires  
                         _buildStatBadge(
                           Icons.comment,
-                          '0', // TODO: Ajouter commentsCount au modèle
+                          report.commentsCount.toString(),
                           const Color(0xFF007A3F),
                         ),
                         

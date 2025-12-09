@@ -765,45 +765,67 @@ class ReportDetailContent extends StatelessWidget {
     final statusInfo = _getStatusInfo();
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: statusInfo['color'],
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: (statusInfo['color'] as Color).withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Text(
-        statusInfo['label'] as String,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.circle,
+            size: 8,
+            color: Colors.white,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            statusInfo['label'] as String,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Map<String, dynamic> _getStatusInfo() {
-    switch (report.status) {
-      case 'pending':
-        return {
-          'label': 'En cours',
-          'color': const Color(0x420023D1), // #0023D142
-        };
-      case 'resolved':
-        return {
-          'label': 'Résolu',
-          'color': const Color(0x3634C759), // #34C75936
-        };
-      case 'in_progress':
-        return {
-          'label': 'En attente',
-          'color': const Color(0x70FFA000), // #FFA00070
-        };
-      default:
-        return {
-          'label': 'Inconnu',
-          'color': Colors.grey,
-        };
+    // Le backend renvoie les statuts en français
+    final status = report.status.toLowerCase().trim();
+    
+    // Mapping pour les statuts en français du backend
+    if (status == 'en attente' || status == 'pending') {
+      return {
+        'label': 'En attente',
+        'color': const Color(0xFFFFA000), // Orange #FFA00070
+      };
+    } else if (status == 'en cours' || status == 'in_progress') {
+      return {
+        'label': 'En cours',
+        'color': const Color(0xFF0023D1), // Bleu #0023D142
+      };
+    } else if (status == 'résolu' || status == 'resolu' || status == 'resolved') {
+      return {
+        'label': 'Résolu',
+        'color': const Color(0xFF34C759), // Vert #34C75936
+      };
     }
+    
+    // Fallback
+    return {
+      'label': report.status,
+      'color': Colors.grey,
+    };
   }
 
   String _formatDate(String dateStr) {

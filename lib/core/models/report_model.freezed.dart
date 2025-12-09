@@ -35,11 +35,13 @@ mixin _$ReportModel {
   LocationModel? get location =>
       throw _privateConstructorUsedError; // Images URLs (peut être une liste vide)
   List<String> get images =>
-      throw _privateConstructorUsedError; // Likes (Phase 4)
+      throw _privateConstructorUsedError; // Likes & Comments counts (Phase 4)
   @JsonKey(name: 'likes_count')
   int get likesCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_liked')
   bool get isLiked => throw _privateConstructorUsedError;
+  @JsonKey(name: 'comments_count')
+  int get commentsCount => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -70,6 +72,7 @@ abstract class $ReportModelCopyWith<$Res> {
       List<String> images,
       @JsonKey(name: 'likes_count') int likesCount,
       @JsonKey(name: 'is_liked') bool isLiked,
+      @JsonKey(name: 'comments_count') int commentsCount,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt});
 
@@ -103,6 +106,7 @@ class _$ReportModelCopyWithImpl<$Res, $Val extends ReportModel>
     Object? images = null,
     Object? likesCount = null,
     Object? isLiked = null,
+    Object? commentsCount = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -155,6 +159,10 @@ class _$ReportModelCopyWithImpl<$Res, $Val extends ReportModel>
           ? _value.isLiked
           : isLiked // ignore: cast_nullable_to_non_nullable
               as bool,
+      commentsCount: null == commentsCount
+          ? _value.commentsCount
+          : commentsCount // ignore: cast_nullable_to_non_nullable
+              as int,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -224,6 +232,7 @@ abstract class _$$ReportModelImplCopyWith<$Res>
       List<String> images,
       @JsonKey(name: 'likes_count') int likesCount,
       @JsonKey(name: 'is_liked') bool isLiked,
+      @JsonKey(name: 'comments_count') int commentsCount,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt});
 
@@ -258,6 +267,7 @@ class __$$ReportModelImplCopyWithImpl<$Res>
     Object? images = null,
     Object? likesCount = null,
     Object? isLiked = null,
+    Object? commentsCount = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -310,6 +320,10 @@ class __$$ReportModelImplCopyWithImpl<$Res>
           ? _value.isLiked
           : isLiked // ignore: cast_nullable_to_non_nullable
               as bool,
+      commentsCount: null == commentsCount
+          ? _value.commentsCount
+          : commentsCount // ignore: cast_nullable_to_non_nullable
+              as int,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -338,6 +352,7 @@ class _$ReportModelImpl implements _ReportModel {
       final List<String> images = const [],
       @JsonKey(name: 'likes_count') this.likesCount = 0,
       @JsonKey(name: 'is_liked') this.isLiked = false,
+      @JsonKey(name: 'comments_count') this.commentsCount = 0,
       @JsonKey(name: 'created_at') this.createdAt = null,
       @JsonKey(name: 'updated_at') this.updatedAt = null})
       : _images = images;
@@ -381,13 +396,16 @@ class _$ReportModelImpl implements _ReportModel {
     return EqualUnmodifiableListView(_images);
   }
 
-// Likes (Phase 4)
+// Likes & Comments counts (Phase 4)
   @override
   @JsonKey(name: 'likes_count')
   final int likesCount;
   @override
   @JsonKey(name: 'is_liked')
   final bool isLiked;
+  @override
+  @JsonKey(name: 'comments_count')
+  final int commentsCount;
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
@@ -397,7 +415,7 @@ class _$ReportModelImpl implements _ReportModel {
 
   @override
   String toString() {
-    return 'ReportModel(id: $id, title: $title, description: $description, status: $status, categoryId: $categoryId, userId: $userId, user: $user, category: $category, location: $location, images: $images, likesCount: $likesCount, isLiked: $isLiked, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'ReportModel(id: $id, title: $title, description: $description, status: $status, categoryId: $categoryId, userId: $userId, user: $user, category: $category, location: $location, images: $images, likesCount: $likesCount, isLiked: $isLiked, commentsCount: $commentsCount, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -422,6 +440,8 @@ class _$ReportModelImpl implements _ReportModel {
             (identical(other.likesCount, likesCount) ||
                 other.likesCount == likesCount) &&
             (identical(other.isLiked, isLiked) || other.isLiked == isLiked) &&
+            (identical(other.commentsCount, commentsCount) ||
+                other.commentsCount == commentsCount) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -444,6 +464,7 @@ class _$ReportModelImpl implements _ReportModel {
       const DeepCollectionEquality().hash(_images),
       likesCount,
       isLiked,
+      commentsCount,
       createdAt,
       updatedAt);
 
@@ -475,6 +496,7 @@ abstract class _ReportModel implements ReportModel {
           final List<String> images,
           @JsonKey(name: 'likes_count') final int likesCount,
           @JsonKey(name: 'is_liked') final bool isLiked,
+          @JsonKey(name: 'comments_count') final int commentsCount,
           @JsonKey(name: 'created_at') final String? createdAt,
           @JsonKey(name: 'updated_at') final String? updatedAt}) =
       _$ReportModelImpl;
@@ -504,12 +526,15 @@ abstract class _ReportModel implements ReportModel {
   LocationModel? get location;
   @override // Images URLs (peut être une liste vide)
   List<String> get images;
-  @override // Likes (Phase 4)
+  @override // Likes & Comments counts (Phase 4)
   @JsonKey(name: 'likes_count')
   int get likesCount;
   @override
   @JsonKey(name: 'is_liked')
   bool get isLiked;
+  @override
+  @JsonKey(name: 'comments_count')
+  int get commentsCount;
   @override
   @JsonKey(name: 'created_at')
   String? get createdAt;

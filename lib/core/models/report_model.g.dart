@@ -29,6 +29,7 @@ _$ReportModelImpl _$$ReportModelImplFromJson(Map<String, dynamic> json) =>
           const [],
       likesCount: (json['likes_count'] as num?)?.toInt() ?? 0,
       isLiked: json['is_liked'] as bool? ?? false,
+      commentsCount: (json['comments_count'] as num?)?.toInt() ?? 0,
       createdAt: json['created_at'] as String? ?? null,
       updatedAt: json['updated_at'] as String? ?? null,
     );
@@ -47,6 +48,7 @@ Map<String, dynamic> _$$ReportModelImplToJson(_$ReportModelImpl instance) =>
       'images': instance.images,
       'likes_count': instance.likesCount,
       'is_liked': instance.isLiked,
+      'comments_count': instance.commentsCount,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
     };
