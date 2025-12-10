@@ -1,6 +1,6 @@
 /// Constantes pour les endpoints API
 class ApiConstants {
-  // 🌐 API Backend déployée sur artist-dev.com
+  // 🌐 API Backend locale (dev)
   static const String baseUrl = 'https://samacite.artist-dev.com/api';
   
   // Auth endpoints
