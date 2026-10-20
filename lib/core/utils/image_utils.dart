@@ -1,14 +1,20 @@
+import 'package:mobile_samacite/core/constants/api_constants.dart';
+
 /// Utilitaires pour la gestion des images
 class ImageUtils {
-  /// URL de base du serveur (sans /api)
-  static const String _baseServerUrl = 'http://10.0.2.2:8000';
+  /// URL de base du serveur (sans /api), dérivée de ApiConstants.baseUrl
+  /// pour ne jamais être désynchronisée de l'URL de l'API utilisée.
+  static String get _baseServerUrl {
+    final apiUrl = ApiConstants.baseUrl;
+    return apiUrl.endsWith('/api') ? apiUrl.substring(0, apiUrl.length - 4) : apiUrl;
+  }
 
   /// Convertit un chemin d'image relatif en URL complète
-  /// 
-  /// Exemples :
-  /// - `/storage/reports/image.jpg` → `http://10.0.2.2:8000/storage/reports/image.jpg`
+  ///
+  /// Exemples (avec l'URL de l'API en production) :
+  /// - `/storage/reports/image.jpg` → `https://samacite.artist-dev.com/storage/reports/image.jpg`
   /// - `http://example.com/image.jpg` → `http://example.com/image.jpg` (déjà complet)
-  /// - `storage/reports/image.jpg` → `http://10.0.2.2:8000/storage/reports/image.jpg`
+  /// - `storage/reports/image.jpg` → `https://samacite.artist-dev.com/storage/reports/image.jpg`
   static String getFullImageUrl(String imagePath) {
     // Si déjà une URL complète (commence par http:// ou https://)
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
