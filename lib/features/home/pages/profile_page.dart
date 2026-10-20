@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_samacite/core/constants/app_colors.dart';
+import 'package:mobile_samacite/core/utils/image_utils.dart';
 import 'package:mobile_samacite/features/auth/providers/auth_notifier.dart';
 import 'package:mobile_samacite/features/auth/providers/auth_state.dart';
 import 'package:mobile_samacite/features/auth/pages/login_page.dart';
 import 'package:mobile_samacite/features/home/pages/edit_profile_page.dart';
 import 'package:mobile_samacite/features/home/pages/change_password_page.dart';
 import 'package:mobile_samacite/features/notifications/pages/notification_list_page.dart';
+import 'package:mobile_samacite/features/notifications/state/notification_notifier.dart';
 
-class ProfilePage extends ConsumerWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends ConsumerState<ProfilePage> {
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
 
     ref.listen<AuthState>(authNotifierProvider, (previous, next) {
@@ -30,192 +37,141 @@ class ProfilePage extends ConsumerWidget {
     });
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FD),
       body: authState.maybeWhen(
-        authenticated: (user, token) => SafeArea(
-          bottom: true,
-          child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header moderne avec avatar et dégradé
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(24, 60, 24, 32),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.secondary,
-                      AppColors.secondary.withOpacity(0.8),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+        authenticated: (user, token) {
+          return SafeArea(
+            bottom: true,
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(child: _buildHeader(context, ref, user)),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                          const Text(
+                            'MON COMPTE',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.1,
+                              color: Color(0xFF1E293B),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildSettingsItem(
+                            icon: Icons.edit_outlined,
+                            iconBg: const Color(0xFFFFF7ED),
+                            iconColor: AppColors.primary,
+                            title: 'Modifier mon profil',
+                            subtitle: 'Nom, email et téléphone',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProfilePage(user: user),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          Consumer(
+                            builder: (context, ref, _) {
+                              final unreadCount = ref.watch(notificationNotifierProvider).unreadCount;
+                              return _buildSettingsItem(
+                                icon: Icons.notifications_none_rounded,
+                                iconBg: const Color(0xFFECFDF5),
+                                iconColor: AppColors.secondary,
+                                title: 'Mes notifications',
+                                subtitle: 'Alertes et suivis de signalements',
+                                badge: unreadCount > 0 ? unreadCount.toString() : null,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const NotificationListPage(),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          _buildSettingsItem(
+                            icon: Icons.lock_outline_rounded,
+                            iconBg: const Color(0xFFEFF6FF),
+                            iconColor: const Color(0xFF3B82F6),
+                            title: 'Changer le mot de passe',
+                            subtitle: 'Sécurité et authentification',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ChangePasswordPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          _buildSettingsItem(
+                            icon: Icons.info_outline_rounded,
+                            iconBg: const Color(0xFFF1F5F9),
+                            iconColor: const Color(0xFF64748B),
+                            title: 'À propos de SamaCité',
+                            subtitle: 'Version 1.0.0',
+                            onTap: () {
+                              showAboutDialog(
+                                context: context,
+                                applicationName: 'SamaCité',
+                                applicationVersion: '1.0.0',
+                                applicationLegalese: 'Signaler, suivre et améliorer notre ville.',
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          _buildLogoutButton(context, ref),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Icon(Icons.shield_outlined, size: 14, color: Color(0xFF64748B)),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Données citoyennes chiffrées & protégées',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF64748B),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'SamaCité • Agir ensemble pour notre cadre de vie',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF94A3B8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.secondary.withOpacity(0.3),
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
                 ),
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 4,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: CircleAvatar(
-                        radius: 55,
-                        backgroundColor: AppColors.primary,
-                        child: Text(
-                          '${user.prenom[0]}${user.nom[0]}'.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textOnPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      '${user.prenom} ${user.nom}',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        user.email ?? user.telephone,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              // Informations du profil
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Informations',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildInfoCard(
-                      icon: Icons.person_rounded,
-                      iconColor: AppColors.secondary,
-                      title: 'Nom complet',
-                      value: '${user.prenom} ${user.nom}',
-                    ),
-                    if (user.email != null)
-                      _buildInfoCard(
-                        icon: Icons.email_rounded,
-                        iconColor: AppColors.primary,
-                        title: 'Email',
-                        value: user.email!,
-                      ),
-                    _buildInfoCard(
-                      icon: Icons.phone_rounded,
-                      iconColor: AppColors.secondary,
-                      title: 'Téléphone',
-                      value: user.telephone,
-                    ),
-                    const SizedBox(height: 32),
-                    const Text(
-                      'Paramètres',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildActionCard(
-                      context,
-                      icon: Icons.edit_rounded,
-                      iconColor: AppColors.primary,
-                      title: 'Modifier le profil',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditProfilePage(user: user),
-                          ),
-                        );
-                      },
-                    ),
-                    _buildActionCard(
-                      context,
-                      icon: Icons.lock_rounded,
-                      iconColor: AppColors.secondary,
-                      title: 'Changer le mot de passe',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ChangePasswordPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    _buildActionCard(
-                      context,
-                      icon: Icons.notifications_rounded,
-                      iconColor: AppColors.primary,
-                      title: 'Notifications',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NotificationListPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    _buildLogoutCard(context, ref),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          ),
-        ),
+              ],
+            ),
+          );
+        },
         orElse: () => const Center(
           child: CircularProgressIndicator(),
         ),
@@ -223,244 +179,380 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  /// Carte d'information moderne sans numéros de téléphone dupliqués
-  Widget _buildInfoCard({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String value,
-  }) {
+  // --- HEADER AVEC DÉGRADÉ ---
+  Widget _buildHeader(BuildContext context, WidgetRef ref, dynamic user) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.secondary, Color(0xFF00A854)],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: AppColors.secondary.withOpacity(0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Row(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 8,
+        left: 20,
+        right: 20,
+        bottom: 28,
+      ),
+      child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 24,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.location_city_rounded, color: AppColors.secondary, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'SAMACITÉ',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      Text(
+                        'Profil',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Consumer(
+                builder: (context, ref, _) {
+                  final unreadCount = ref.watch(notificationNotifierProvider).unreadCount;
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const NotificationListPage(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 26),
+                      ),
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: 4,
+                          top: 4,
+                          child: Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                              color: AppColors.danger,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                            child: Text(
+                              unreadCount > 99 ? '99+' : unreadCount.toString(),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.12),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundColor: AppColors.primary,
+                  backgroundImage: (user.photoUrl != null && user.photoUrl!.isNotEmpty)
+                      ? NetworkImage(ImageUtils.getFullImageUrl(user.photoUrl!))
+                      : null,
+                  child: (user.photoUrl == null || user.photoUrl!.isEmpty)
+                      ? Text(
+                          '${user.prenom[0]}${user.nom[0]}'.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textOnPrimary,
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(bottom: 2, right: 2),
+                padding: const EdgeInsets.all(7),
+                decoration: const BoxDecoration(
+                  color: AppColors.secondary,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.camera_alt_rounded,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            '${user.prenom} ${user.nom}',
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withOpacity(0.4)),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                Icon(Icons.verified_rounded, size: 14, color: Colors.white),
+                SizedBox(width: 6),
                 Text(
-                  title,
+                  'Citoyen actif SamaCité',
                   style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary.withOpacity(0.7),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
+                    color: Colors.white,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  /// Carte d'action moderne
-  Widget _buildActionCard(
-    BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey.shade50],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+          const SizedBox(height: 10),
+          if (user.email != null) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: iconColor,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
+                const Icon(Icons.mail_outline_rounded, size: 14, color: Colors.white70),
+                const SizedBox(width: 5),
+                Flexible(
                   child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
+                    user.email!,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 18,
-                  color: AppColors.textSecondary.withOpacity(0.5),
                 ),
               ],
             ),
+            const SizedBox(height: 4),
+          ],
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.phone_outlined, size: 14, color: Colors.white70),
+              const SizedBox(width: 5),
+              Text(
+                user.telephone,
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ],
           ),
-        ),
+        ],
       ),
     );
   }
 
-  /// Carte de déconnexion moderne
-  Widget _buildLogoutCard(BuildContext context, WidgetRef ref) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [AppColors.danger, AppColors.danger.withOpacity(0.8)],
+
+  // --- LIST ITEM PARAMÈTRE / MENU ---
+  Widget _buildSettingsItem({
+    required IconData icon,
+    required Color iconBg,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    String? badge,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.withOpacity(0.08)),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.danger.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                title: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.danger.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.logout_rounded,
-                        color: AppColors.danger,
-                        size: 24,
-                      ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: iconColor, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1E293B),
                     ),
-                    const SizedBox(width: 12),
-                    const Text('Déconnexion'),
-                  ],
-                ),
-                content: const Text(
-                  'Êtes-vous sûr de vouloir vous déconnecter ?',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Annuler'),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ref.read(authNotifierProvider.notifier).logout();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.danger,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                    ),
-                    child: const Text(
-                      'Déconnexion',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF64748B),
                     ),
                   ),
                 ],
               ),
-            );
-          },
-          borderRadius: BorderRadius.circular(16),
-          child: const Padding(
-            padding: EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.logout_rounded,
-                  color: Colors.white,
-                  size: 24,
+            ),
+            if (badge != null) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
                 ),
-                SizedBox(width: 12),
-                Text(
-                  'Déconnexion',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+                child: Text(
+                  badge,
+                  style: const TextStyle(
                     color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
+              ),
+              const SizedBox(width: 8),
+            ],
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: Color(0xFF94A3B8),
+              size: 20,
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- BOUTON DE DÉCONNEXION ---
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text('Déconnexion'),
+            content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Annuler', style: TextStyle(color: Color(0xFF64748B))),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.danger,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  ref.read(authNotifierProvider.notifier).logout();
+                },
+                child: const Text('Se déconnecter', style: TextStyle(color: Colors.white)),
+              ),
+            ],
           ),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFEF2F2),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFFECACA)),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.logout_rounded, color: AppColors.danger, size: 20),
+            SizedBox(width: 8),
+            Text(
+              'Déconnexion',
+              style: TextStyle(
+                color: AppColors.danger,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ),
     );

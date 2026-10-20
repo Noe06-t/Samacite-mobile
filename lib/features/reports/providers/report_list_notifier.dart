@@ -31,14 +31,17 @@ class ReportListNotifier extends StateNotifier<ReportListState> {
 
     try {
       // Récupérer les filtres actifs depuis le provider
+      // Le statut n'est volontairement PAS envoyé au serveur : le backend a
+      // des valeurs de statut incohérentes (anglais/français selon les
+      // signalements), donc le filtrage par statut se fait côté client
+      // (voir normalizeStatus / report_list_page.dart).
       final filters = _ref.read(reportFilterProvider);
       print('[ReportListNotifier] 📡 Appel getReports...');
-      print('[ReportListNotifier] 🔍 Filtres: status=${filters.status}, categoryId=${filters.categoryId}, search=${filters.searchQuery}');
-      
+      print('[ReportListNotifier] 🔍 Filtres: categoryId=${filters.categoryId}, search=${filters.searchQuery}');
+
       final result = await _repository.getReports(
         page: 1,
         perPage: _perPage,
-        status: filters.status,
         categoryId: filters.categoryId,
         searchQuery: filters.searchQuery,
         startDate: filters.startDate,
@@ -105,13 +108,12 @@ class ReportListNotifier extends StateNotifier<ReportListState> {
     try {
       final nextPage = state.currentPage + 1;
       
-      // Récupérer les filtres actifs
+      // Récupérer les filtres actifs (statut filtré côté client, voir plus haut)
       final filters = _ref.read(reportFilterProvider);
 
       final result = await _repository.getReports(
         page: nextPage,
         perPage: _perPage,
-        status: filters.status,
         categoryId: filters.categoryId,
         searchQuery: filters.searchQuery,
         startDate: filters.startDate,

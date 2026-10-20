@@ -118,7 +118,9 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
             ),
             child: const Icon(Icons.arrow_back_rounded, size: 20, color: Colors.black),
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.maybePop(context);
+          },
         ),
       ),
       body: SingleChildScrollView(

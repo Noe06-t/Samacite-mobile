@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'notification_model.freezed.dart';
@@ -91,10 +92,10 @@ extension NotificationModelX on NotificationModel {
   }
   
   /// Retourne l'icône appropriée selon le type
-  String get icon {
-    if (type.contains('ReportCreated')) return '📍';
-    if (type.contains('CommentCreated')) return '💬';
-    if (type.contains('StatusChanged')) return '🔄';
-    return '🔔';
+  IconData get icon {
+    if (type.contains('ReportCreated')) return Icons.location_on;
+    if (type.contains('CommentCreated')) return Icons.chat_bubble;
+    if (type.contains('StatusChanged')) return Icons.sync;
+    return Icons.notifications;
   }
 }

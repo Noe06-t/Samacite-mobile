@@ -14,21 +14,20 @@ import 'package:mobile_samacite/features/splash/splash_screen.dart';
 /// Notifications gérées via API Laravel uniquement (pas de Firebase)
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialisation Hive pour le cache local
-  await Hive.initFlutter();
-  
-  // Enregistrement des adapters Hive
-  Hive.registerAdapter(ReportModelHiveAdapter());
-  Hive.registerAdapter(CategoryModelHiveAdapter());
-  
-  // Les box seront ouvertes à la demande (lazy loading)
 
+  // L'app démarre immédiatement : le premier frame Flutter s'affiche dès que
+  // possible pour que l'écran natif Android disparaisse au plus vite. Hive
+  // s'initialise ensuite en arrière-plan pendant que le SplashScreen Flutter
+  // est déjà visible (les box sont de toute façon ouvertes à la demande).
   runApp(
     const ProviderScope(
       child: MyApp(),
     ),
   );
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(ReportModelHiveAdapter());
+  Hive.registerAdapter(CategoryModelHiveAdapter());
 }
 
 class MyApp extends StatelessWidget {

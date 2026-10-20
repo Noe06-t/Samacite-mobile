@@ -102,6 +102,9 @@ dev_dependencies:
   # Launcher icon
   flutter_launcher_icons: ^0.13.1
 
+  # Splash screen natif
+  flutter_native_splash: ^2.4.1
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -150,3 +153,17 @@ flutter_launcher_icons:
   image_path: "assets/images/samacite_logo.png"
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/images/samacite_logo.png"
+
+# Configuration de l'écran de démarrage natif (Android/iOS)
+# Pas de logo ici volontairement : l'image n'étant pas carrée, elle se déforme
+# dans le cadre imposé par le système. On garde juste un fond blanc instantané
+# qui se fond avec le vrai SplashScreen Flutter (lib/features/splash/splash_screen.dart).
+flutter_native_splash:
+  color: "#FFFFFF"
+  android_12:
+    color: "#FFFFFF"
+    icon_background_color: "#FFFFFF"
+    image: assets/images/transparent_pixel.png
+  android: true
+  ios: true
+  fullscreen: false

@@ -18,17 +18,21 @@ class MainNavigationPage extends ConsumerStatefulWidget {
 class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
   int _currentIndex = 0;
   StreamSubscription? _notificationSubscription;
-
-  final List<Widget> _pages = [
-    const HomePage(),
-    const ReportListPage(),
-    const MapPage(),
-    const ProfilePage(),
-  ];
+  late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
+    _pages = [
+      const HomePage(),
+      ReportListPage(
+        onRootBack: () => setState(() => _currentIndex = 0),
+      ),
+      MapPage(
+        onRootBack: () => setState(() => _currentIndex = 0),
+      ),
+      const ProfilePage(),
+    ];
     _setupNotificationListener();
   }
 
@@ -68,9 +72,16 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: Container(
+    return PopScope<void>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (_currentIndex != 0) {
+          setState(() => _currentIndex = 0);
+        }
+      },
+      child: Scaffold(
+        body: _pages[_currentIndex],
+        bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
@@ -123,6 +134,7 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

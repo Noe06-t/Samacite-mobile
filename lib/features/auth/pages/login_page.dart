@@ -109,7 +109,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 children: [
                   Center(
                     child: Image.asset(
-                      'assets/images/samacite_logo.jpg',
+                      'assets/images/samacite_logo.png',
                       width: 180,
                       height: 180,
                       fit: BoxFit.contain,

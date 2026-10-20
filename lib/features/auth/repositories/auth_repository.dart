@@ -2,12 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:mobile_samacite/core/services/dio_service.dart';
 import 'package:mobile_samacite/core/constants/api_constants.dart';
 import 'package:mobile_samacite/core/models/auth_response_model.dart';
+import 'package:mobile_samacite/core/models/user_model.dart';
 import 'package:mobile_samacite/core/errors/api_exception.dart';
 
 /// Interface du repository d'authentification
 abstract class IAuthRepository {
   Future<AuthResponseModel> register(Map<String, dynamic> data);
   Future<AuthResponseModel> login(String email, String password);
+  Future<UserModel> getProfile();
   Future<void> logout();
 }
 
@@ -163,6 +165,20 @@ class AuthRepository implements IAuthRepository {
       throw ApiException(
         message: 'Erreur inattendue: $e',
       );
+    }
+  }
+
+  @override
+  Future<UserModel> getProfile() async {
+    try {
+      final response = await _dioService.dio.get('/user/profile');
+      final responseData = response.data as Map<String, dynamic>;
+      final profileData = responseData['data'] as Map<String, dynamic>;
+      return UserModel.fromJson(profileData);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ApiException(message: 'Impossible de restaurer la session: $e');
     }
   }
 

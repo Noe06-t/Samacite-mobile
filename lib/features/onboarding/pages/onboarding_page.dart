@@ -92,7 +92,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Image.asset(
-                    'assets/images/samacite_logo.jpg',
+                    'assets/images/samacite_logo.png',
                     height: 50,
                   ),
                   if (_currentPage < _slides.length - 1)

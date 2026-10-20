@@ -51,6 +51,28 @@ void main() {
       expect(find.text('Route endommagée'), findsOneWidget);
     });
 
+    testWidgets('DOIT afficher le nombre de commentaires', (tester) async {
+      const mockReport = ReportModel(
+        id: 1,
+        title: 'Route endommagée',
+        description: 'Nids de poule dangereux',
+        status: 'pending',
+        categoryId: 1,
+        userId: 1,
+        commentsCount: 3,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ReportItemWidget(report: mockReport),
+          ),
+        ),
+      );
+
+      expect(find.text('3'), findsOneWidget);
+    });
+
     testWidgets('DOIT afficher image placeholder si pas d\'image', (tester) async {
       // Arrange
       const mockReport = ReportModel(

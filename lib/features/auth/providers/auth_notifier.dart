@@ -17,15 +17,29 @@ class AuthNotifier extends _$AuthNotifier {
     final secureStorage = ref.read(secureStorageServiceProvider);
     final token = await secureStorage.getToken();
 
-    if (token != null) {
-      // ⚠️ NE PAS charger le token automatiquement ici
-      // Cela empêche les nouveaux login de fonctionner avec un token expiré
-      // Le token sera chargé uniquement après un login réussi
-      print('[AuthNotifier] 🔑 Token trouvé dans le stockage (non chargé automatiquement)');
-      // Ici, vous pourriez récupérer les infos utilisateur depuis le serveur
-      // Pour l'instant, on reste en initial
-    } else {
+    if (token == null || token.isEmpty) {
       print('[AuthNotifier] ❌ Aucun token trouvé');
+      state = const AuthState.unauthenticated();
+      return;
+    }
+
+    try {
+      print('[AuthNotifier] 🔑 Token trouvé, restauration de la session...');
+      final dioService = ref.read(dioServiceProvider);
+      dioService.setToken(token);
+
+      final user = await ref.read(authRepositoryProvider).getProfile();
+      state = AuthState.authenticated(user, token);
+      print('[AuthNotifier] ✅ Session restaurée pour ${user.prenom} ${user.nom}');
+    } on ApiException catch (e) {
+      print('[AuthNotifier] ⚠️ Token invalide ou expiré: ${e.message}');
+      await secureStorage.clearAll();
+      ref.read(dioServiceProvider).clearToken();
+      state = const AuthState.unauthenticated();
+    } catch (e) {
+      print('[AuthNotifier] ⚠️ Échec de restauration: $e');
+      await secureStorage.clearAll();
+      ref.read(dioServiceProvider).clearToken();
       state = const AuthState.unauthenticated();
     }
   }

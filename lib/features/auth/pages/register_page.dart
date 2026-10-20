@@ -111,7 +111,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 // Logo
                 Center(
                   child: Image.asset(
-                    'assets/images/samacite_logo.jpg',
+                    'assets/images/samacite_logo.png',
                     width: 180,
                     height: 180,
                     fit: BoxFit.contain,

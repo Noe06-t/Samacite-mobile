@@ -7,6 +7,7 @@ import 'package:mobile_samacite/core/models/report_model.dart';
 import 'package:mobile_samacite/core/utils/image_utils.dart';
 import 'package:mobile_samacite/features/reports/pages/report_detail_page.dart';
 import 'package:mobile_samacite/core/utils/page_transitions.dart';
+import 'package:mobile_samacite/core/utils/status_utils.dart';
 
 /// Page "Mes signalements"
 /// 
@@ -217,6 +218,23 @@ class _MyReportsPageState extends ConsumerState<MyReportsPage> {
       ),
       child: Row(
         children: [
+          InkWell(
+            onTap: () => Navigator.maybePop(context),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -348,7 +366,7 @@ class _MyReportsPageState extends ConsumerState<MyReportsPage> {
                         ],
                       ),
                       child: Text(
-                        report.status,
+                        _getStatusLabel(report.status),
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -378,18 +396,26 @@ class _MyReportsPageState extends ConsumerState<MyReportsPage> {
   }
 
   Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'en cours':
+    switch (normalizeStatus(status)) {
       case 'in_progress':
         return const Color(0xFF0023D1);
-      case 'résolu':
       case 'resolved':
         return const Color(0xFF34C759);
-      case 'en attente':
       case 'pending':
-        return const Color(0xFFFFA000);
       default:
-        return AppColors.textSecondary;
+        return const Color(0xFFFFA000);
+    }
+  }
+
+  String _getStatusLabel(String status) {
+    switch (normalizeStatus(status)) {
+      case 'in_progress':
+        return 'En cours';
+      case 'resolved':
+        return 'Résolu';
+      case 'pending':
+      default:
+        return 'En attente';
     }
   }
 

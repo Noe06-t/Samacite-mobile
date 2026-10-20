@@ -152,9 +152,10 @@ class NotificationTile extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: Center(
-        child: Text(
+        child: Icon(
           notification.icon,
-          style: const TextStyle(fontSize: 20),
+          size: 20,
+          color: _getTypeColor(),
         ),
       ),
     );

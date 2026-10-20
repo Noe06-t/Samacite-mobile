@@ -42,7 +42,7 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
           next.aiAnalysisError != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('⚠️ ${next.aiAnalysisError}'),
+            content: Text(next.aiAnalysisError!),
             backgroundColor: const Color(0xFFFFA000),
             duration: const Duration(seconds: 3),
           ),
@@ -85,7 +85,9 @@ class _TakePhotoPageState extends ConsumerState<TakePhotoPage> {
             ),
             child: const Icon(Icons.arrow_back_rounded, size: 20),
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.maybePop(context);
+          },
         ),
       ),
       body: SafeArea(
